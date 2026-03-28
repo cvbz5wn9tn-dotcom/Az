@@ -37,8 +37,6 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
-        .hub-ring { transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        .no-jitter { backface-visibility: hidden; transform: translateZ(0); }
         .info-tooltip .tooltip-content {
             visibility: hidden; width: 280px; background-color: #1e293b; color: #fff;
             text-align: left; border-radius: 8px; padding: 12px; position: absolute;
@@ -50,9 +48,6 @@
         #error-display { display: none; color: #ef4444; padding: 20px; font-family: monospace; }
         .inline-input { transition: all 0.2s; }
         .inline-input:focus { box-shadow: 0 2px 0 0 #3b82f6; }
-        .smart-input { transition: all 0.3s ease; }
-        .smart-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
-        .hide-arrows::-webkit-outer-spin-button, .hide-arrows::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="min-h-screen text-slate-800 antialiased selection:bg-[#1e3a8a] selection:text-white">
@@ -80,99 +75,46 @@
             StopCircle: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10" /><rect width="6" height="6" x="9" y="9" /></>} {...props} />,
             ArrowLeft: (props) => <SharedIcon path={<><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></>} {...props} />,
             CheckCircle2: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></>} {...props} />,
-            BarChart3: (props) => <SharedIcon path={<><path d="M3 3v18h18" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></>} {...props} />,
             Wind: (props) => <SharedIcon path={<><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></>} {...props} />,
-            BookOpen: (props) => <SharedIcon path={<><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></>} {...props} />,
-            X: (props) => <SharedIcon path={<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>} {...props} />,
-            AlertTriangle: (props) => <SharedIcon path={<><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></>} {...props} />,
-            CheckCircle: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></>} {...props} />,
-            XCircle: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></>} {...props} />,
-            RotateCcw: (props) => <SharedIcon path={<><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></>} {...props} />,
-            Cpu: (props) => <SharedIcon path={<><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 14h3"/><path d="M1 9h3"/><path d="M1 14h3"/></>} {...props} />,
-            Globe: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>} {...props} />,
-            ExternalLink: (props) => <SharedIcon path={<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></>} {...props} />
+            Globe: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>} {...props} />
         };
 
         const DICT = {
             en: {
                 lang: 'en',
-                streamsTitle: "STREAMS", guidelinesTitle: "SOP & Guidelines",
-                streamElectrical: "ELECTRICAL", streamNitrogen: "NITROGEN", streamAir: "AIR", streamWater: "WATER", streamSteam: "STEAM",
+                streamsTitle: "STREAMS",
+                streamElectrical: "ELECTRICAL", streamNitrogen: "NITROGEN",
                 titleElec: "Electrical Peak Simulator", subtitleElec: "Stream 01 Decision Support",
                 currentPeak: "Current Peak Load (MW)", editHint: "Click to edit base load",
                 safeZone: "< 112 MW (Safe)", dangerZone: "112 - 114 MW (Danger)", criticalZone: "> 114 MW (Critical)",
                 assistantTitle: "Smart Operation Assistant", assistantSub: "Automated 'What If' Scenarios", reset: "Reset",
-                critAlert: "Critical Overload", critDesc: "Current load exceeds 114 MW. Do not energize new equipment. Action is required to balance the grid below 112 MW.",
-                warnAlert: "Danger Zone", warnDesc: "Current load is in the danger zone (112-114 MW).",
-                urgentQ: "Is the energization request strictly URGENT?",
-                yesUrgent: "Yes, Urgent", noPostpone: "No, Postpone",
-                postponed: "Operation Postponed", postponedDesc: "Please delay the request until grid load stabilizes.",
-                stableAlert: "Grid is Stable",
                 addLoadPrompt: "Expected load of the new equipment (MW):", simulateBtn: "Simulate Impact",
-                safeOp: "Safe to Energize", safeOpDesc: "Expected peak is under 112 MW. Safe to proceed.",
+                safeOp: "Safe to Energize", 
+                safeOpDesc: "Expected peak will remain within safe limits ({val} MW). Safe to proceed.",
                 expHighAlert: "Expected Peak is High", expHighDesc: "Adding this equipment pushes the grid to Danger Zone (112-114 MW).",
                 expCritAlert: "Expected Peak is Critical", expCritDesc: "Adding this equipment exceeds the absolute limit (>114 MW).",
-                actionReq: "Grid Balancing Required", targetRed: "Capacity Needed (<112MW):",
-                shedPrompt: "Enter load to SHED (MW):", applyShed: "Apply Shedding",
-                genReq: "Increase Generation", genReqDesc: "Shedding is insufficient. Increase internal generation by:",
-                genNote: "Max capacity per generator is 21 MW.",
-                success: "Grid Secured", successDesc: "Grid is balanced. Safe to proceed.", mw: "MW",
-                genControl: "Internal Generators Control", gen: "Gen", maxGen: "Max 21",
+                mw: "MW",
                 titleNitro: "Nitrogen Dashboard", subtitleNitro: "Stream 02 Performance",
-                nitroOverview: "Nitrogen Overview", live: "LIVE", sim: "SIMULATOR",
-                sysDemand: "System Demand", designPeak: "Design Peak", dailyAlloc: "Daily Allocation",
-                consGauges: "Consumption Gauges", total: "Total", plantLoads: "Plant Loads", attachExcel: "Attach Excel", syncStop: "Stop Sync",
-                nitroAsstTitle: "Nitrogen Smart Assistant", nitroAsstSub: "Demand Simulation", nitroSimBtn: "Simulate Request",
-                nitroAddPrompt: "Enter requested quantity (Ton/h):", nitroSafe: "Safe to Proceed",
-                nitroSafeDesc: "Expected total consumption will remain under the 31 Ton/h threshold.",
-                nitroWarn: "Daily Limit Risk", nitroWarnDesc: "Adding this request pushes total consumption over 31 Ton/h. Sustaining this rate for 24 hours risks exceeding the daily limit (744 Ton).",
-                attachHelp: "Attachment Instructions",
-                attachSteps: [
-                    "Open Excel sheet.",
-                    "Press Update then save the file.",
-                    "Attach the excel sheet and keep the file open.",
-                    "Every time you want to update the data, update the excel and save."
-                ]
+                nitroOverview: "Nitrogen Overview",
+                attachExcel: "Attach Excel", syncStop: "Stop Sync"
             },
             ar: {
                 lang: 'ar',
-                streamsTitle: "المسارات", guidelinesTitle: "الأدلة الإرشادية",
-                streamElectrical: "الكهرباء", streamNitrogen: "النيتروجين", streamAir: "الهواء", streamWater: "المياه", streamSteam: "البخار",
-                titleElec: "Electrical Peak Simulator", subtitleElec: "Stream 01 Decision Support",
+                streamsTitle: "المسارات",
+                streamElectrical: "الكهرباء", streamNitrogen: "النيتروجين",
+                titleElec: "محاكي ذروة الكهرباء", subtitleElec: "المسار 01: دعم القرار",
                 currentPeak: "حمل الذروة للشبكة الفعلي", editHint: "انقر لتعديل الحمل الأساسي",
                 safeZone: "أقل من 112 (آمن)", dangerZone: "112 - 114 (خطر)", criticalZone: "أعلى من 114 (حرج)",
                 assistantTitle: "المساعد التشغيلي الذكي", assistantSub: "محاكاة السيناريوهات المؤتمتة", reset: "إعادة تقييم",
-                critAlert: "تجاوز الحد الحرج", critDesc: "الحمل الحالي يتجاوز 114 ميجاوات. يجب خفض الحمل أو زيادة التوليد لتأمين الشبكة (أقل من 112). لا تقم بتشغيل أي معدة.",
-                warnAlert: "منطقة الخطر", warnDesc: "الحمل الحالي مرتفع جداً ويقع في منطقة الخطر (112-114 ميجاوات).",
-                urgentQ: "هل طلب التشغيل يعتبر أمراً طارئاً وضرورياً جداً؟",
-                yesUrgent: "نعم، ضروري", noPostpone: "لا، يمكن التأجيل",
-                postponed: "تم تأجيل التشغيل", postponedDesc: "بما أن الطلب غير ضروري، يرجى تأجيل التشغيل وجدولته لاحقاً عندما يكون الحمل أقل من 114 للحفاظ على استقرار الشبكة.",
-                stableAlert: "الشبكة مستقرة",
                 addLoadPrompt: "أدخل الاستهلاك المتوقع للمعدة المراد تشغيلها:", simulateBtn: "محاكاة التأثير",
-                safeOp: "تصريح بالتشغيل (آمن)", safeOpDesc: "الاستهلاك الكلي المتوقع سيبقى ضمن الحدود الآمنة (أقل من 112). يمكنك المضي قدماً في التشغيل.",
+                safeOp: "تصريح بالتشغيل (آمن)", 
+                safeOpDesc: "الاستهلاك الكلي المتوقع سيبقى ضمن الحدود الآمنة ({val} ميجاوات). يمكنك المضي قدماً في التشغيل.",
                 expHighAlert: "تنبيه: الحمل المتوقع مرتفع", expHighDesc: "تشغيل هذه المعدة سيدخل الشبكة في منطقة الخطر (112-114).",
                 expCritAlert: "تنبيه: الحمل المتوقع حرج", expCritDesc: "تشغيل هذه المعدة سيتجاوز الحد الأقصى المسموح للشبكة (114+).",
-                actionReq: "إجراء مطلوب لموازنة الشبكة", targetRed: "الطاقة المطلوبة لتأمين الشبكة (<112):",
-                shedPrompt: "أدخل استهلاك المعدة المراد إطفاؤها (Load Shedding):", applyShed: "تأكيد الإطفاء",
-                genReq: "يتطلب رفع التوليد الداخلي", genReqDesc: "عملية الإطفاء غير كافية. لتأمين الشبكة، يجب زيادة التوليد بمقدار:",
-                genNote: "ملاحظة هامة: أقصى طاقة للمولد الواحد هي 21 ميجاوات.",
-                success: "تم تأمين الشبكة", successDesc: "الشبكة الآن متزنة وآمنة. يمكنك المضي قدماً في التشغيل.", mw: "ميجاوات",
-                genControl: "التحكم بالمولدات الداخلية", gen: "Gen", maxGen: "حد أقصى 21",
-                titleNitro: "Nitrogen Dashboard", subtitleNitro: "Stream 02 Performance",
-                nitroOverview: "نظرة عامة للنيتروجين", live: "مباشر", sim: "محاكي",
-                sysDemand: "طلب النظام (System Demand)", designPeak: "ذروة التصميم (Peak)", dailyAlloc: "المخصص اليومي",
-                consGauges: "عدادات الاستهلاك", total: "الإجمالي", plantLoads: "أحمال المصانع", attachExcel: "إرفاق ملف إكسل", syncStop: "إيقاف المزامنة",
-                nitroAsstTitle: "المساعد الذكي للنيتروجين", nitroAsstSub: "محاكاة طلبات الاستهلاك", nitroSimBtn: "محاكاة الكمية",
-                nitroAddPrompt: "أدخل الكمية المطلوبة (طن/ساعة):", nitroSafe: "آمن للتشغيل",
-                nitroSafeDesc: "الاستهلاك الكلي المتوقع سيبقى ضمن الحدود الآمنة (أقل من 31 طن/ساعة).",
-                nitroWarn: "خطر تجاوز الحد اليومي", nitroWarnDesc: "الكمية المطلوبة سترفع الاستهلاك الكلي ليتجاوز 31 طن/ساعة. الاستمرار بهذا المعدل لمدة 24 ساعة سيعرضنا لتجاوز الحد اليومي المسموح (744 طن).",
-                attachHelp: "تعليمات الإرفاق",
-                attachSteps: [
-                    "افتح ملف الإكسل.",
-                    "اضغط على تحديث (Update) ثم احفظ الملف.",
-                    "قم بإرفاق ملف الإكسل وأبقِ الملف مفتوحاً.",
-                    "في كل مرة تريد تحديث البيانات، قم بتحديث الإكسل واحفظه."
-                ]
+                mw: "ميجاوات",
+                titleNitro: "لوحة النيتروجين", subtitleNitro: "المسار 02: الأداء",
+                nitroOverview: "نظرة عامة للنيتروجين",
+                attachExcel: "إرفاق ملف إكسل", syncStop: "إيقاف المزامنة"
             }
         };
 
@@ -194,26 +136,6 @@
             </header>
         );
 
-        const FileUploader = ({ onFileUpload, t, onShowHelp }) => {
-            const [isSyncing, setIsSyncing] = useState(false); const intervalRef = useRef(null); const lastModifiedRef = useRef(0);
-            const startLiveSync = async () => {
-                try {
-                    const [handle] = await window.showOpenFilePicker(); const file = await handle.getFile(); setIsSyncing(true); lastModifiedRef.current = file.lastModified; await onFileUpload(file);
-                    intervalRef.current = setInterval(async () => { const currentFile = await handle.getFile(); if (currentFile.lastModified > lastModifiedRef.current) { lastModifiedRef.current = currentFile.lastModified; await onFileUpload(currentFile); } }, 2000);
-                } catch (e) { console.error("Sync error", e); }
-            };
-            return (
-                <div className="flex items-center gap-2">
-                    <button onClick={onShowHelp} title={t.attachHelp} className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition-colors focus:outline-none">
-                        <SharedIcons.Info className="w-5 h-5" />
-                    </button>
-                    <div className="info-tooltip relative flex items-center">
-                        {isSyncing ? <button onClick={() => {clearInterval(intervalRef.current); setIsSyncing(false);}} className="flex items-center px-4 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg text-sm font-bold animate-pulse"><SharedIcons.StopCircle className="w-4 h-4 mr-2" /> {t.syncStop}</button> : <button onClick={startLiveSync} className="flex items-center px-5 py-2.5 bg-blue-900 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-blue-800 transition-all"><SharedIcons.FolderInput className="w-4 h-4 mr-2" /> {t.attachExcel}</button>}
-                    </div>
-                </div>
-            );
-        };
-
         const InlineEditable = ({ value, unit, onSave }) => {
             const [isEditing, setIsEditing] = useState(false);
             const [tempVal, setTempVal] = useState(value);
@@ -222,194 +144,38 @@
             if (isEditing) {
                 return (
                     <div className="flex items-center gap-1 animate-fade-in">
-                        <input autoFocus type="number" value={tempVal} onChange={e => setTempVal(e.target.value)} onBlur={commit} onKeyDown={e => e.key === 'Enter' && commit()} className="w-16 text-center text-xs font-black text-blue-900 bg-blue-50/50 outline-none inline-input px-1 py-0.5 rounded" dir="ltr" />
-                        {unit && <span className="text-[10px] font-bold text-slate-500">{unit}</span>}
+                        <input autoFocus type="number" value={tempVal} onChange={e => setTempVal(e.target.value)} onBlur={commit} onKeyDown={e => e.key === 'Enter' && commit()} className="w-20 text-center text-lg font-black text-blue-900 bg-blue-50/50 outline-none inline-input px-2 py-1 rounded" dir="ltr" />
+                        {unit && <span className="text-sm font-bold text-slate-500">{unit}</span>}
                     </div>
                 );
             }
             return (
-                <div onClick={() => setIsEditing(true)} className="flex items-center gap-1 cursor-pointer group px-2 py-0.5 rounded hover:bg-blue-50 transition-colors" title="Click to edit">
-                    <span className="text-[11px] font-black text-slate-700 group-hover:text-blue-600 border-b border-dashed border-slate-300 group-hover:border-blue-500 transition-colors" dir="ltr">{value}</span>
-                    {unit && <span className="text-[10px] font-bold text-slate-500">{unit}</span>}
+                <div onClick={() => setIsEditing(true)} className="flex items-center gap-1 cursor-pointer group px-2 py-1 rounded hover:bg-blue-50 transition-colors" title="Click to edit">
+                    <span className="text-2xl font-black text-slate-700 group-hover:text-blue-600 border-b-2 border-dashed border-slate-300 group-hover:border-blue-500 transition-colors" dir="ltr">{value}</span>
+                    {unit && <span className="text-sm font-bold text-slate-500">{unit}</span>}
                 </div>
             );
         };
 
-        const ElectricalSmartAssistant = ({ currentLoad, lang }) => {
+        const Overview = ({ onNavigate, lang, setLang }) => {
             const t = DICT[lang];
-            const TARGET_SAFE = 111.9; 
-            
-            const [phase, setPhase] = useState('INIT'); 
-            const [addedLoad, setAddedLoad] = useState('');
-            const [shedLoad, setShedLoad] = useState('');
-            const [expectedLoad, setExpectedLoad] = useState(0);
-
-            useEffect(() => { setPhase('INIT'); setAddedLoad(''); setShedLoad(''); }, [currentLoad]);
-
-            const isDangerCurrent = currentLoad >= 112 && currentLoad < 114;
-            const isCritCurrent = currentLoad >= 114;
-            const activeExpected = phase === 'INIT' ? currentLoad : expectedLoad;
-            
-            const targetTotalToReduce = isDangerCurrent && phase === 'ACTION_REQ' ? currentLoad : activeExpected;
-            const requiredReduction = Math.max(0, targetTotalToReduce - TARGET_SAFE);
-            const remainingReduction = Math.max(0, requiredReduction - Number(shedLoad || 0));
-
-            const renderPhase = () => {
-                if (phase === 'INIT') {
-                    if (isCritCurrent) {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.AlertTriangle className="w-16 h-16 text-rose-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-rose-600 mb-2">{t.critAlert}</h3>
-                                <p className="text-slate-600 mb-8 max-w-sm mx-auto">{t.critDesc}</p>
-                                <button onClick={() => { setExpectedLoad(currentLoad); setPhase('ACTION_REQ'); }} className="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">{t.actionReq}</button>
-                            </div>
-                        );
-                    } else if (isDangerCurrent) {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.Activity className="w-16 h-16 text-amber-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-amber-600 mb-2">{t.warnAlert}</h3>
-                                <p className="text-slate-600 mb-8 max-w-sm mx-auto">{t.warnDesc}<br/><br/><strong className="text-slate-800">{t.urgentQ}</strong></p>
-                                <div className="flex gap-4 justify-center">
-                                    <button onClick={() => setPhase('INPUT_ADDED')} className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-sm w-44">{t.yesUrgent}</button>
-                                    <button onClick={() => setPhase('POSTPONED')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-xl transition-all w-44">{t.noPostpone}</button>
-                                </div>
-                            </div>
-                        );
-                    } else {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.stableAlert}</h3>
-                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto mt-6">
-                                    <label className="block text-sm font-bold text-slate-600 mb-4">{t.addLoadPrompt}</label>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <input type="number" value={addedLoad} onChange={e => setAddedLoad(e.target.value)} placeholder="0.0" className="w-full text-center text-3xl font-black text-blue-900 bg-blue-50/50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
-                                        <span className="text-lg font-bold text-slate-400">{t.mw}</span>
-                                    </div>
-                                    <button onClick={() => { if(!addedLoad || isNaN(addedLoad)) return; setExpectedLoad(currentLoad + Number(addedLoad)); setPhase('EVAL_EXPECTED'); }} disabled={!addedLoad} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl transition-all shadow-md">{t.simulateBtn}</button>
-                                </div>
-                            </div>
-                        );
-                    }
-                }
-
-                if (phase === 'INPUT_ADDED') {
-                    return (
-                        <div className="animate-fade-in text-center">
-                            <h3 className="text-xl font-black text-blue-900 mb-6">{t.actionReq}</h3>
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto">
-                                <label className="block text-sm font-bold text-slate-600 mb-4">{t.addLoadPrompt}</label>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <input type="number" value={addedLoad} onChange={e => setAddedLoad(e.target.value)} placeholder="0.0" className="w-full text-center text-3xl font-black text-blue-900 bg-blue-50/50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
-                                    <span className="text-lg font-bold text-slate-400">{t.mw}</span>
-                                </div>
-                                <button onClick={() => { if(!addedLoad) return; setExpectedLoad(currentLoad + Number(addedLoad)); setPhase('ACTION_REQ'); }} disabled={!addedLoad} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl transition-all shadow-md">{t.simulateBtn}</button>
-                            </div>
-                        </div>
-                    );
-                }
-
-                if (phase === 'EVAL_EXPECTED') {
-                    if (expectedLoad < 112) {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.CheckCircle className="w-20 h-20 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.safeOp}</h3>
-                                <p className="text-slate-600 max-w-sm mx-auto font-medium">{t.safeOpDesc}</p>
-                            </div>
-                        );
-                    } else {
-                        const isCrit = expectedLoad >= 114;
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.AlertTriangle className={`w-16 h-16 mx-auto mb-4 drop-shadow-md ${isCrit ? 'text-rose-500' : 'text-amber-500'}`} />
-                                <h3 className={`text-2xl font-black mb-2 ${isCrit ? 'text-rose-600' : 'text-amber-600'}`}>{isCrit ? t.expCritAlert : t.expHighAlert}</h3>
-                                <p className="text-slate-600 mb-8 max-w-sm mx-auto">{isCrit ? t.expCritDesc : t.expHighDesc}<br/><br/><strong className="text-slate-800">{t.urgentQ}</strong></p>
-                                <div className="flex gap-4 justify-center">
-                                    <button onClick={() => setPhase('ACTION_REQ')} className={`text-white font-bold py-3 px-6 rounded-xl transition-all shadow-sm w-44 ${isCrit ? 'bg-rose-500 hover:bg-rose-600' : 'bg-amber-500 hover:bg-amber-600'}`}>{t.yesUrgent}</button>
-                                    <button onClick={() => setPhase('POSTPONED')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-xl transition-all w-44">{t.noPostpone}</button>
-                                </div>
-                            </div>
-                        );
-                    }
-                }
-
-                if (phase === 'POSTPONED') {
-                    return (
-                        <div className="animate-fade-in text-center">
-                            <SharedIcons.XCircle className="w-20 h-20 text-slate-400 mx-auto mb-4" />
-                            <h3 className="text-2xl font-black text-slate-600 mb-2">{t.postponed}</h3>
-                            <p className="text-slate-500 max-w-sm mx-auto leading-relaxed">{t.postponedDesc}</p>
-                        </div>
-                    );
-                }
-
-                if (phase === 'ACTION_REQ') {
-                    if (remainingReduction <= 0) {
-                        return (
-                            <div className="animate-fade-in text-center mt-6">
-                                <SharedIcons.CheckCircle className="w-20 h-20 text-blue-500 mx-auto mb-4 drop-shadow-lg" />
-                                <h3 className="text-3xl font-black text-blue-700 mb-2">{t.success}</h3>
-                                <p className="text-slate-600 font-medium">{t.successDesc}</p>
-                            </div>
-                        );
-                    }
-                    return (
-                        <div className="animate-fade-in w-full max-w-md mx-auto">
-                            <div className="bg-blue-50 border border-blue-200 p-5 rounded-2xl mb-6">
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-sm font-bold text-blue-900">{t.targetRed}</span>
-                                    <span className="text-2xl font-black text-blue-700" dir="ltr">{requiredReduction.toFixed(1)} <span className="text-sm">{t.mw}</span></span>
-                                </div>
-                            </div>
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6">
-                                <label className="block text-sm font-bold text-slate-600 mb-4">{t.shedPrompt}</label>
-                                <div className="flex items-center gap-3">
-                                    <input type="number" value={shedLoad} onChange={e => setShedLoad(e.target.value)} placeholder="0.0" className="w-full text-center text-2xl font-black text-rose-900 bg-rose-50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
-                                    <span className="text-lg font-bold text-slate-400">{t.mw}</span>
-                                </div>
-                            </div>
-                            {shedLoad !== '' && remainingReduction > 0 && (
-                                <div className="bg-amber-50 p-6 rounded-2xl border border-amber-200 animate-fade-in">
-                                    <h4 className="text-lg font-black text-amber-800 mb-2 flex items-center gap-2"><SharedIcons.Zap className="w-5 h-5"/> {t.genReq}</h4>
-                                    <p className="text-xs text-amber-700 mb-4 leading-relaxed">{t.genReqDesc}</p>
-                                    <div className="text-3xl font-black text-amber-600 mb-4 text-center" dir="ltr">
-                                        {remainingReduction.toFixed(1)} <span className="text-base">{t.mw}</span>
-                                    </div>
-                                    <p className="text-[10px] text-amber-600/80 font-bold bg-amber-100/50 p-2 rounded text-center">{t.genNote}</p>
-                                </div>
-                            )}
-                        </div>
-                    );
-                }
-                return null;
-            };
-
             return (
-                <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden flex flex-col h-full min-h-[500px]">
-                    <div className="bg-slate-900 text-white p-5 flex justify-between items-center z-10">
-                        <div className="flex items-center gap-3">
-                            <SharedIcons.Cpu className="w-6 h-6 text-blue-400"/>
-                            <div>
-                                <h3 className="text-lg font-black">{t.assistantTitle}</h3>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{t.assistantSub}</p>
+                <div dir={lang === 'ar' ? 'rtl' : 'ltr'} className={lang === 'ar' ? 'font-arabic' : 'font-sans'}>
+                    <DashboardHeader title={t.streamsTitle} subtitle="Overview" icon={SharedIcons.Activity} lang={lang} setLang={setLang} />
+                    <div className="max-w-5xl mx-auto p-6 mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <button onClick={() => onNavigate('ELECTRICAL_DASHBOARD')} className="flex flex-col items-center justify-center p-10 bg-white rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-blue-400 transition-all group">
+                            <div className="bg-blue-50 p-6 rounded-full group-hover:bg-blue-900 transition-colors mb-4">
+                                <SharedIcons.Zap className="w-16 h-16 text-blue-900 group-hover:text-white transition-colors" />
                             </div>
-                        </div>
-                        <button onClick={() => {setPhase('INIT'); setAddedLoad(''); setShedLoad('');}} className="flex items-center gap-1.5 text-[10px] bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-colors font-bold text-white">
-                            <SharedIcons.RotateCcw className="w-3 h-3" /> {t.reset}
+                            <h2 className="text-2xl font-bold text-slate-800">{t.streamElectrical}</h2>
                         </button>
-                    </div>
-                    
-                    <div className="bg-slate-50 border-b border-slate-100 py-2 px-6 flex justify-between text-[11px] font-bold text-slate-500" dir="ltr">
-                        <span>Current Net: <strong className="text-slate-800">{currentLoad.toFixed(1)}</strong></span>
-                        {addedLoad && <span>Added: <strong className="text-amber-600">+{Number(addedLoad).toFixed(1)}</strong></span>}
-                        {expectedLoad > 0 && phase !== 'INIT' && <span>Expected: <strong className="text-blue-600">{expectedLoad.toFixed(1)}</strong></span>}
-                    </div>
 
-                    <div className="p-8 flex-1 flex flex-col justify-center relative bg-gradient-to-b from-white to-slate-50">
-                        {renderPhase()}
+                        <button onClick={() => onNavigate('NITROGEN_DASHBOARD')} className="flex flex-col items-center justify-center p-10 bg-white rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-blue-400 transition-all group">
+                            <div className="bg-blue-50 p-6 rounded-full group-hover:bg-blue-900 transition-colors mb-4">
+                                <SharedIcons.Wind className="w-16 h-16 text-blue-900 group-hover:text-white transition-colors" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-800">{t.streamNitrogen}</h2>
+                        </button>
                     </div>
                 </div>
             );
@@ -417,211 +183,89 @@
 
         const ElectricalDashboard = ({ onBack, lang, setLang }) => {
             const t = DICT[lang];
-            const isRTL = lang === 'ar';
+            const [baseLoad, setBaseLoad] = useState(110);
+            const [newLoad, setNewLoad] = useState('');
+            const [simulated, setSimulated] = useState(false);
 
-            const [baseLoad, setBaseLoad] = useState(108.5); 
-            const [gens, setGens] = useState([0, 0, 0]); 
-            
-            const totalGen = gens.reduce((a, b) => a + b, 0);
-            const currentGridLoad = Math.max(0, baseLoad - totalGen); 
-            
-            const gaugeMax = 120;
-            const percentage = Math.min((currentGridLoad / gaugeMax) * 100, 100);
-            const rotation = -90 + (percentage / 100) * 180;
-            let gaugeColor = currentGridLoad >= 114 ? '#ef4444' : currentGridLoad >= 112 ? '#f59e0b' : '#10b981';
+            const expectedPeak = baseLoad + (parseFloat(newLoad) || 0);
 
-            const updateGen = (index, val) => {
-                let parsed = parseFloat(val) || 0;
-                if (parsed > 21) parsed = 21; 
-                if (parsed < 0) parsed = 0;
-                const newGens = [...gens];
-                newGens[index] = parsed;
-                setGens(newGens);
+            const handleSimulate = () => {
+                if(newLoad !== '') setSimulated(true);
             };
 
             return (
-                <div className={`min-h-screen bg-slate-50 font-${isRTL ? 'arabic' : 'sans'} text-slate-800 animate-fade-in pb-12`} dir={isRTL ? 'rtl' : 'ltr'}>
+                <div dir={lang === 'ar' ? 'rtl' : 'ltr'} className={`min-h-screen bg-slate-50 ${lang === 'ar' ? 'font-arabic' : 'font-sans'}`}>
                     <DashboardHeader title={t.titleElec} subtitle={t.subtitleElec} icon={SharedIcons.Zap} onBack={onBack} lang={lang} setLang={setLang} />
-
-                    <main className="max-w-7xl mx-auto px-4 py-8 mt-4">
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                            <div className="lg:col-span-5 flex flex-col gap-6">
-                                <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8 flex flex-col items-center relative overflow-hidden flex-1">
-                                    <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-8">{t.currentPeak}</h2>
-                                    
-                                    <div className="relative w-full max-w-[280px] aspect-[2/1] mb-6">
-                                        <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible">
-                                            <path d="M 10 90 A 90 90 0 0 1 190 90" fill="none" stroke="#f1f5f9" strokeWidth="20" strokeLinecap="round" />
-                                            <path d="M 10 90 A 90 90 0 0 1 190 90" fill="none" stroke={gaugeColor} strokeWidth="20" strokeLinecap="round" strokeDasharray={Math.PI * 90} strokeDashoffset={(Math.PI * 90) * (1 - percentage/100)} className="transition-all duration-700 ease-out" />
-                                            <g transform={`translate(100, 90) rotate(${rotation})`} className="transition-transform duration-700 ease-out">
-                                                <circle cx="0" cy="0" r="6" fill="#1e293b" />
-                                                <path d="M -3 0 L 0 -75 L 3 0 Z" fill="#1e293b" />
-                                            </g>
-                                        </svg>
-                                    </div>
-
-                                    <div className="relative z-10 w-full flex flex-col items-center group">
-                                        <input 
-                                            type="number" 
-                                            value={currentGridLoad === 0 ? '' : Number(currentGridLoad.toFixed(1))} 
-                                            onChange={e => setBaseLoad((parseFloat(e.target.value) || 0) + totalGen)} 
-                                            className="w-full max-w-[180px] text-center text-6xl font-black bg-transparent outline-none border-b-4 border-dashed border-slate-200 focus:border-blue-500 transition-colors py-2 hide-arrows"
-                                            style={{ color: gaugeColor }} step="0.1" dir="ltr"
-                                        />
-                                        <span className="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">{t.editHint}</span>
-                                    </div>
-
-                                    <div className="w-full mt-6 grid grid-cols-1 gap-2 text-[10px] font-bold">
-                                        <div className="flex items-center gap-2 p-2 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                            <div className="w-2 h-2 rounded-full bg-emerald-500"></div> {t.safeZone}
-                                        </div>
-                                        <div className="flex items-center gap-2 p-2 rounded bg-amber-50 text-amber-700 border border-amber-100">
-                                            <div className="w-2 h-2 rounded-full bg-amber-500"></div> {t.dangerZone}
-                                        </div>
-                                        <div className="flex items-center gap-2 p-2 rounded bg-rose-50 text-rose-700 border border-rose-100">
-                                            <div className="w-2 h-2 rounded-full bg-rose-500"></div> {t.criticalZone}
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="w-full mt-8 pt-6 border-t border-slate-100">
-                                        <h3 className="text-xs font-bold text-blue-900 mb-4 uppercase tracking-widest text-center">{t.genControl}</h3>
-                                        <div className="grid grid-cols-3 gap-3">
-                                            {['A', 'B', 'C'].map((letter, i) => (
-                                                <div key={letter} className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col items-center transition-all hover:border-blue-300">
-                                                    <span className="text-[10px] font-bold text-slate-500 mb-1">{t.gen} {letter}</span>
-                                                    <input 
-                                                        type="number" min="0" max="21" value={gens[i] || ''} 
-                                                        onChange={(e) => updateGen(i, e.target.value)} 
-                                                        placeholder="0"
-                                                        className="w-full text-center text-xl font-black text-blue-800 bg-transparent border-b-2 border-slate-300 focus:border-blue-500 outline-none hide-arrows py-1" dir="ltr"
-                                                    />
-                                                    <span className="text-[8px] font-bold text-slate-400 mt-1 uppercase">{t.maxGen}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <a href="" target="_blank" rel="noopener noreferrer" className="bg-gradient-to-r from-blue-900 to-blue-800 rounded-3xl shadow-lg border border-blue-700 p-6 flex items-center justify-between transition-all hover:shadow-xl hover:-translate-y-1 group">
-                                    <div className="flex items-center gap-4">
-                                        <div className="bg-white/10 p-3 rounded-xl group-hover:bg-white/20 transition-colors">
-                                            <SharedIcons.Activity className="w-6 h-6 text-blue-100" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-sm font-black text-white uppercase tracking-wider" dir="ltr">Live Monitoring Dashboard</h3>
-                                            <p className="text-[10px] text-blue-200 font-bold uppercase tracking-widest mt-1">{lang === 'ar' ? 'الانتقال للوحة المصنع الفعلية' : 'Go to actual plant dashboard'}</p>
-                                        </div>
-                                    </div>
-                                    <SharedIcons.ExternalLink className="w-5 h-5 text-blue-300 group-hover:text-white transition-colors" />
-                                </a>
-                            </div>
-
-                            <div className="lg:col-span-7 h-full">
-                                <ElectricalSmartAssistant currentLoad={currentGridLoad} lang={lang} />
-                            </div>
-
-                        </div>
-                    </main>
-                </div>
-            );
-        };
-
-        const NitroGauge = ({ value, max, label, unit }) => {
-            const displayValue = Math.min(Math.max(value, 0), max * 1.2);
-            const radius = 70; const centerX = 100; const centerY = 85; const arcLength = Math.PI * radius;
-            const rotation = -90 + (Math.min(displayValue / max, 1) * 180);
-            
-            let statusColor = "text-emerald-500"; 
-            if (value > max) statusColor = "text-rose-500";
-            else if (value > (max * 0.85)) statusColor = "text-amber-500";
-
-            return (
-                <div className="flex-1 flex flex-col items-center justify-center w-full">
-                    <div className="relative w-full max-w-[140px]">
-                        <svg viewBox="0 0 200 105" className="w-full h-auto overflow-visible">
-                            <path d={`M 30 85 A 70 70 0 0 1 170 85`} fill="none" stroke="#f1f5f9" strokeWidth="16" strokeLinecap="round" />
-                            <path d={`M 30 85 A 70 70 0 0 1 170 85`} fill="none" stroke={statusColor === 'text-emerald-500' ? '#10b981' : statusColor === 'text-rose-500' ? '#ef4444' : '#f59e0b'} strokeWidth="16" strokeLinecap="round" strokeDasharray={arcLength} strokeDashoffset={arcLength * (1 - Math.min(displayValue / max, 1))} className="transition-all duration-1000 ease-out" />
-                            <g transform={`translate(${centerX}, ${centerY}) rotate(${rotation})`} className="transition-transform duration-1000"><circle cx="0" cy="0" r="4" fill="#1e293b" /><path d="M -2 0 L 0 -65 L 2 0 Z" fill="#1e293b" /></g>
-                        </svg>
-                        <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center translate-y-4">
-                            <span className={`text-2xl font-black ${statusColor}`} dir="ltr">{value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
-                        </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-6" dir="ltr">{label} ({unit})</span>
-                </div>
-            );
-        };
-
-        const NitrogenSmartAssistant = ({ activeTotalTonH, lang }) => {
-            const t = DICT[lang];
-            const LIMIT = 31.0;
-            
-            const [phase, setPhase] = useState('INIT');
-            const [addedQty, setAddedQty] = useState('');
-            const [totalExpected, setTotalExpected] = useState(0);
-
-            const renderPhase = () => {
-                if (phase === 'INIT') {
-                    return (
-                        <div className="animate-fade-in text-center">
-                            <SharedIcons.Wind className="w-16 h-16 text-sky-500 mx-auto mb-4 drop-shadow-md opacity-80" />
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto mt-6">
-                                <label className="block text-sm font-bold text-slate-600 mb-4">{t.nitroAddPrompt}</label>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <input type="number" value={addedQty} onChange={e => setAddedQty(e.target.value)} placeholder="0.0" className="w-full text-center text-3xl font-black text-sky-900 bg-sky-50/50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
-                                    <span className="text-sm font-bold text-slate-400">T/h</span>
-                                </div>
-                                <button onClick={() => { if(!addedQty || isNaN(addedQty)) return; setTotalExpected(activeTotalTonH + Number(addedQty)); setPhase('EVAL'); }} disabled={!addedQty} className="w-full bg-sky-600 hover:bg-sky-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl transition-all shadow-md">{t.nitroSimBtn}</button>
-                            </div>
-                        </div>
-                    );
-                }
-
-                if (phase === 'EVAL') {
-                    const isOverLimit = totalExpected > LIMIT;
-                    if (!isOverLimit) {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.CheckCircle className="w-20 h-20 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.nitroSafe}</h3>
-                                <p className="text-slate-600 max-w-sm mx-auto font-medium">{t.nitroSafeDesc}</p>
-                            </div>
-                        );
-                    } else {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.AlertTriangle className="w-20 h-20 text-rose-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-rose-600 mb-2">{t.nitroWarn}</h3>
-                                <p className="text-slate-600 max-w-sm mx-auto font-medium leading-relaxed">{t.nitroWarnDesc}</p>
-                            </div>
-                        );
-                    }
-                }
-            };
-
-            return (
-                <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden flex flex-col h-full min-h-[450px]">
-                    <div className="bg-slate-900 text-white p-5 flex justify-between items-center z-10">
-                        <div className="flex items-center gap-3">
-                            <SharedIcons.Cpu className="w-6 h-6 text-sky-400"/>
-                            <div>
-                                <h3 className="text-lg font-black">{t.nitroAsstTitle}</h3>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{t.nitroAsstSub}</p>
-                            </div>
-                        </div>
-                        <button onClick={() => {setPhase('INIT'); setAddedQty('');}} className="flex items-center gap-1.5 text-[10px] bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-colors font-bold text-white">
-                            <SharedIcons.RotateCcw className="w-3 h-3" /> {t.reset}
-                        </button>
-                    </div>
                     
-                    <div className="bg-slate-50 border-b border-slate-100 py-2 px-6 flex justify-between text-[11px] font-bold text-slate-500" dir="ltr">
-                        <span>Current: <strong className="text-slate-800">{activeTotalTonH.toFixed(1)}</strong></span>
-                        {addedQty && <span>Added: <strong className="text-sky-600">+{Number(addedQty).toFixed(1)}</strong></span>}
-                        {phase === 'EVAL' && <span>Expected: <strong className={totalExpected > LIMIT ? "text-rose-600" : "text-emerald-600"}>{totalExpected.toFixed(1)}</strong></span>}
-                    </div>
+                    <div className="max-w-4xl mx-auto p-4 mt-6 animate-fade-in">
+                        {/* Current Load Section */}
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-col items-center">
+                            <h3 className="text-slate-500 font-bold mb-2 uppercase tracking-wider">{t.currentPeak}</h3>
+                            <InlineEditable value={baseLoad} unit={t.mw} onSave={(val) => { setBaseLoad(val); setSimulated(false); }} />
+                            <p className="text-xs text-slate-400 mt-2">{t.editHint}</p>
+                        </div>
 
-                    <div className="p-8 flex-1 flex flex-col justify-center relative bg-gradient-to-b from-white to-slate-50">
-                        {renderPhase()}
+                        {/* Smart Assistant Section */}
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-blue-900">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="bg-blue-100 p-2 rounded-lg text-blue-900"><SharedIcons.Activity className="w-6 h-6" /></div>
+                                <div>
+                                    <h3 className="font-bold text-xl text-slate-800">{t.assistantTitle}</h3>
+                                    <p className="text-sm text-slate-500">{t.assistantSub}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col md:flex-row gap-4 items-end mb-8">
+                                <div className="flex-1 w-full">
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">{t.addLoadPrompt}</label>
+                                    <input 
+                                        type="number" 
+                                        value={newLoad} 
+                                        onChange={e => {setNewLoad(e.target.value); setSimulated(false);}} 
+                                        className="w-full border-2 border-slate-200 p-3 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors text-lg" 
+                                        placeholder="0"
+                                    />
+                                </div>
+                                <button 
+                                    onClick={handleSimulate} 
+                                    className="w-full md:w-auto bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all active:scale-95"
+                                >
+                                    {t.simulateBtn}
+                                </button>
+                            </div>
+
+                            {/* Simulation Result Area */}
+                            {simulated && (
+                                <div className="animate-fade-in">
+                                    {expectedPeak < 112 ? (
+                                        <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-xl flex gap-4 items-start">
+                                            <SharedIcons.CheckCircle2 className="w-8 h-8 text-emerald-500 flex-shrink-0" />
+                                            <div>
+                                                <h4 className="font-bold text-emerald-800 text-lg">{t.safeOp}</h4>
+                                                {/* استخدام الاستبدال {val} هنا لعرض القيمة المتوقعة */}
+                                                <p className="text-emerald-600 mt-1">{t.safeOpDesc.replace('{val}', expectedPeak.toFixed(1))}</p>
+                                            </div>
+                                        </div>
+                                    ) : expectedPeak <= 114 ? (
+                                        <div className="bg-amber-50 border border-amber-200 p-6 rounded-xl flex gap-4 items-start">
+                                            <SharedIcons.Info className="w-8 h-8 text-amber-500 flex-shrink-0" />
+                                            <div>
+                                                <h4 className="font-bold text-amber-800 text-lg">{t.expHighAlert}</h4>
+                                                <p className="text-amber-700 mt-1">{t.expHighDesc} ({expectedPeak.toFixed(1)} {t.mw})</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-rose-50 border border-rose-200 p-6 rounded-xl flex gap-4 items-start">
+                                            <SharedIcons.StopCircle className="w-8 h-8 text-rose-500 flex-shrink-0" />
+                                            <div>
+                                                <h4 className="font-bold text-rose-800 text-lg">{t.expCritAlert}</h4>
+                                                <p className="text-rose-700 mt-1">{t.expCritDesc} ({expectedPeak.toFixed(1)} {t.mw})</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             );
@@ -629,318 +273,16 @@
 
         const NitrogenDashboard = ({ onBack, lang, setLang }) => {
             const t = DICT[lang];
-            const isRTL = lang === 'ar';
-            
-            const [viewMode, setViewMode] = useState('live');
-            const [consumers, setConsumers] = useState([]);
-            const [simConsumers, setSimConsumers] = useState([]);
-            const [history, setHistory] = useState([]);
-            const [showHelp, setShowHelp] = useState(false);
-            
-            useEffect(() => {
-                if (viewMode === 'sim') {
-                    setSimConsumers(JSON.parse(JSON.stringify(consumers)));
-                }
-            }, [viewMode, consumers]);
-
-            const processNitroExcel = async (file) => {
-                const buffer = await file.arrayBuffer();
-                const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
-                
-                if (workbook.SheetNames.includes('History')) {
-                    const sheet = workbook.Sheets['History'];
-                    const json = XLSX.utils.sheet_to_json(sheet);
-                    const updatedHistory = json.map(row => ({ 
-                        date: row.date || row.Date || '', 
-                        value: Number(row.value) || Number(row['Daily Consumption']) || 0, 
-                        limit: Number(row.limit) || Number(row['Maximum']) || 604.8 
-                    }));
-                    setHistory(updatedHistory);
-                }
-                
-                if (workbook.SheetNames.includes('Consumers')) {
-                    const sheet = workbook.Sheets['Consumers'];
-                    const json = XLSX.utils.sheet_to_json(sheet);
-                    const updatedConsumers = json.map(row => ({ 
-                        id: row.id || row.name, 
-                        name: row.name, 
-                        category: row.category, 
-                        actual: Number(row.actual) || 0, 
-                        designLimit: Number(row.designLimit) || 0 
-                    }));
-                    setConsumers(updatedConsumers);
-                }
-            };
-
-            const currentConsumers = viewMode === 'live' ? consumers : simConsumers;
-            
-            const liveTotalTonH = consumers.reduce((acc, c) => acc + c.actual, 0) / 1000;
-            const simTotalTonH = currentConsumers.reduce((acc, c) => acc + c.actual, 0) / 1000;
-            const activeTotalTonH = viewMode === 'live' ? liveTotalTonH : simTotalTonH;
-            
-            let cumulativeTon = 0;
-            if (viewMode === 'live') {
-                cumulativeTon = history.length > 0 ? history[history.length - 1].value : (liveTotalTonH * 24);
-            } else {
-                const baseCumulative = history.length > 0 ? history[history.length - 1].value : (liveTotalTonH * 24);
-                const deltaTonH = simTotalTonH - liveTotalTonH;
-                cumulativeTon = baseCumulative + (deltaTonH * 24); 
-            }
-            const cumulativeKNm3 = cumulativeTon / 1.23178;
-
             return (
-                <div className={`min-h-screen bg-slate-50 font-${isRTL ? 'arabic' : 'sans'} text-slate-800 animate-fade-in pb-12 w-full`} dir={isRTL ? 'rtl' : 'ltr'}>
+                <div dir={lang === 'ar' ? 'rtl' : 'ltr'} className={`min-h-screen bg-slate-50 ${lang === 'ar' ? 'font-arabic' : 'font-sans'}`}>
                     <DashboardHeader title={t.titleNitro} subtitle={t.subtitleNitro} icon={SharedIcons.Wind} onBack={onBack} lang={lang} setLang={setLang} />
-                    
-                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-                        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 border-b border-slate-200 pb-6">
-                            <h2 className="text-2xl font-black text-slate-900 uppercase flex items-center gap-3"><SharedIcons.BarChart3 className="w-6 h-6 text-blue-900" /> {t.nitroOverview}</h2>
-                            <div className="bg-slate-200 p-1.5 rounded-xl flex shadow-inner">
-                                <button onClick={() => setViewMode('live')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${viewMode === 'live' ? 'bg-white shadow text-blue-900' : 'text-slate-500'}`}>{t.live}</button>
-                                <button onClick={() => setViewMode('sim')} className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${viewMode === 'sim' ? 'bg-white shadow text-blue-900' : 'text-slate-500'}`}>{t.sim}</button>
-                            </div>
-                        </div>
-                        
-                        <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-8">
-                            <span className="bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-200">
-                                {consumers.length > 0 ? 'Monitoring Active' : 'Waiting for Data...'}
-                            </span>
-                            <FileUploader onFileUpload={processNitroExcel} t={t} onShowHelp={() => setShowHelp(true)} />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 items-stretch">
-                            <div className="bg-blue-900 rounded-xl shadow-md border border-blue-800 p-5 flex flex-col hover:shadow-xl transition-all h-full min-h-[200px] relative overflow-hidden text-white">
-                                <div className="flex justify-between items-center mb-4 relative z-10">
-                                    <h3 className="text-xs font-bold text-blue-100 uppercase tracking-wider">{t.sysDemand}</h3>
-                                    <SharedIcons.Activity className="w-5 h-5 text-blue-300" />
-                                </div>
-                                <div className="flex-1 flex flex-col justify-center relative z-10">
-                                    <div className="flex justify-between items-end mb-2">
-                                        <span className="text-4xl font-black text-white" dir="ltr">{activeTotalTonH.toFixed(1)} <span className="text-sm font-semibold text-blue-200">T/h</span></span>
-                                        <span className="text-[10px] font-bold text-blue-300 uppercase tracking-tighter" dir="ltr">Peak: 31.0 T/h</span>
-                                    </div>
-                                    <div className="w-full bg-blue-950 rounded-full h-4 overflow-hidden border border-blue-800">
-                                        <div className="bg-cyan-400 h-full transition-all duration-1000 shadow-[0_0_10px_rgba(34,211,238,0.5)]" style={{ width: `${Math.min((activeTotalTonH / 31.0) * 100, 100)}%` }} />
-                                    </div>
-                                </div>
-                                <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-600 rounded-full blur-3xl opacity-20 pointer-events-none"></div>
-                            </div>
-
-                            <div className="bg-white rounded-xl shadow-md border border-slate-100 p-5 flex flex-col justify-center gap-4 h-full min-h-[200px]">
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <div className="text-3xl font-black text-slate-800" dir="ltr">31.0 <span className="text-sm font-light text-slate-500">T/h</span></div>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.designPeak}</p>
-                                    </div>
-                                </div>
-                                <div className="h-px bg-slate-100"></div>
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <div className="text-3xl font-black text-slate-800" dir="ltr">744 <span className="text-sm font-light text-slate-500">Ton/Day</span></div>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.dailyAlloc}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-white rounded-xl shadow-md border border-slate-100 p-5 flex flex-col h-full min-h-[200px]">
-                                <h3 className="text-xs font-bold text-slate-500 uppercase mb-2 tracking-wider w-full text-center">{t.consGauges}</h3>
-                                <div className="flex-1 flex w-full pt-2">
-                                    <NitroGauge value={cumulativeTon} max={744} label={t.total} unit="Ton/Day" />
-                                    <NitroGauge value={cumulativeKNm3} max={604.8} label={t.total} unit="kNm³/Day" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                            <div className="lg:col-span-1 bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden h-fit">
-                                <div className="p-5 border-b bg-slate-50"><h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t.plantLoads}</h2></div>
-                                <div className="divide-y divide-slate-50">
-                                    {currentConsumers.length > 0 ? currentConsumers.map(c => {
-                                        const actualTonH = c.actual / 1000;
-                                        const isOver = c.actual > c.designLimit;
-                                        const perc = c.designLimit > 0 ? Math.min((c.actual / c.designLimit) * 100, 100) : 0;
-                                        return (
-                                            <div key={c.id} className={`px-4 py-4 border-l-4 ${isOver ? "bg-red-50 border-red-500" : "border-slate-100"}`}>
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-xs font-bold text-slate-700 uppercase" dir="ltr">{c.name}</span>
-                                                    {viewMode === 'live' ? (
-                                                        <span className="text-xs font-black text-blue-900 bg-blue-50 px-2 py-0.5 rounded" dir="ltr">{actualTonH.toFixed(1)} T/h</span>
-                                                    ) : (
-                                                        <InlineEditable value={actualTonH.toFixed(1)} unit="T/h" onSave={(val) => setSimConsumers(prev => prev.map(con => con.id === c.id ? { ...con, actual: val * 1000 } : con))} />
-                                                    )}
-                                                </div>
-                                                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                                                    <div className={`h-full transition-all duration-500 ${isOver ? "bg-red-500" : (c.category === 'Polymer' ? "bg-emerald-500" : "bg-sky-500")}`} style={{ width: perc + '%' }}></div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }) : <div className="p-6 text-center text-xs text-slate-400 italic">No plants data</div>}
-                                </div>
-                            </div>
-                            
-                            <div className="lg:col-span-3 h-full">
-                                <NitrogenSmartAssistant activeTotalTonH={activeTotalTonH} lang={lang} />
-                            </div>
-                        </div>
-
-                        {showHelp && (
-                            <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-                                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => setShowHelp(false)}></div>
-                                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10 p-6 animate-modal">
-                                    <div className="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
-                                        <h3 className="text-lg font-black text-blue-900 flex items-center gap-2">
-                                            <SharedIcons.Info className="w-5 h-5 text-blue-500" /> {t.attachHelp}
-                                        </h3>
-                                        <button onClick={() => setShowHelp(false)} className="text-slate-400 hover:text-rose-500 transition-colors p-1 rounded-full hover:bg-rose-50 focus:outline-none">
-                                            <SharedIcons.X className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                    <div className="text-sm text-slate-600 font-medium leading-relaxed" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-                                        <ul className="space-y-3">
-                                            {t.attachSteps.map((step, idx) => (
-                                                <li key={idx} className="flex gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100 shadow-sm items-start">
-                                                    <span className="bg-blue-100 text-blue-800 font-black w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs mt-0.5" dir="ltr">{idx + 1}</span>
-                                                    <span className="pt-0.5">{step}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                    <div className="mt-6">
-                                        <button onClick={() => setShowHelp(false)} className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors">
-                                            {lang === 'ar' ? 'إغلاق' : 'Close'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </main>
-                </div>
-            );
-        };
-
-        const OverviewPentagon = ({ stream, onClick, onInfoClick, size = 180 }) => {
-            const points = "50,5 95,38 78,92 22,92 5,38";
-            return (
-                <div className="flex flex-col items-center">
-                    <div onClick={() => onClick(stream)} className={`relative flex items-center justify-center transition-transform duration-700 hover:scale-110 group no-jitter ${stream.target ? 'cursor-pointer' : 'opacity-80'}`} style={{ width: size, height: size }}>
-                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-sm"><polygon points={points} fill="white" stroke={stream.color} strokeWidth="1.2" className="transition-all group-hover:stroke-width-[2.5px]" /></svg>
-                        <div className="relative z-10 flex flex-col items-center"><span className="text-[11px] font-bold tracking-widest leading-tight" style={{ color: stream.color }}>{stream.label}</span><div className="w-1.5 h-1.5 rounded-full mt-4 opacity-20 group-hover:opacity-100 transition-all" style={{ backgroundColor: stream.color }} /></div>
-                    </div>
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); onInfoClick(stream.id); }} 
-                        className="mt-4 p-1.5 rounded-full text-slate-300 hover:text-blue-500 hover:bg-blue-50 transition-all opacity-80 hover:opacity-100"
-                    >
-                        <SharedIcons.BookOpen className="w-4 h-4" />
-                    </button>
-                </div>
-            );
-        };
-
-        const GuidelinesModal = ({ streamId, onClose, t }) => {
-            if (!streamId) return null;
-
-            let content = null;
-            let title = "";
-            let color = "text-blue-900";
-
-            if (streamId === 1) { 
-                title = "Electrical Load Factor Protocol";
-                color = "text-blue-900";
-                content = (
-                    <div className="space-y-5 text-sm text-slate-700 mt-2">
-                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <h4 className="font-bold text-slate-800 flex items-center mb-2">
-                                <span className="bg-slate-800 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] mx-2">1</span>
-                                Objective
-                            </h4>
-                            <p className="text-xs leading-relaxed">
-                                {t.lang === 'ar' ? 'يرجى الدخول للوحة الكهرباء لاستخدام المحاكي الذكي المدمج لتقييم الحالات.' : 'Standard Operating Procedure (SOP) for handling plant requests. Use the built-in Smart Simulator.'}
-                            </p>
+                    <div className="max-w-4xl mx-auto p-4 mt-10 text-center animate-fade-in">
+                        <div className="bg-white p-10 rounded-2xl shadow border border-slate-200">
+                            <SharedIcons.Wind className="w-20 h-20 text-blue-200 mx-auto mb-4" />
+                            <h2 className="text-2xl font-bold text-slate-700">{t.nitroOverview}</h2>
+                            <p className="text-slate-500 mt-2">مكون النيتروجين يعمل بشكل طبيعي... (واجهة العرض الخاصة بالنيتروجين)</p>
                         </div>
                     </div>
-                );
-            } else if (streamId === 2) { 
-                title = "Nitrogen Control Guidelines";
-                color = "text-yellow-600";
-                content = (
-                    <div className="flex flex-col items-center justify-center h-48 text-slate-400">
-                        <SharedIcons.BookOpen className="w-12 h-12 mb-3 opacity-20" />
-                        <p className="text-sm font-bold">
-                             {t.lang === 'ar' ? 'يرجى الدخول للوحة النيتروجين لاستخدام المحاكي الذكي المدمج للطلبات.' : 'Please use the built-in Nitrogen Smart Simulator.'}
-                        </p>
-                    </div>
-                );
-            } else {
-                title = "Stream Guidelines";
-                color = "text-slate-600";
-                content = (
-                    <div className="flex flex-col items-center justify-center h-48 text-slate-400">
-                        <SharedIcons.BookOpen className="w-12 h-12 mb-3 opacity-20" />
-                        <p className="text-sm font-bold">{t.lang === 'ar' ? 'سيتم رفع الأدلة قريباً.' : 'SOP documents will be uploaded soon.'}</p>
-                    </div>
-                );
-            }
-
-            return (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={onClose}></div>
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden relative z-10 animate-modal flex flex-col max-h-[90vh]">
-                        <div className="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50/50">
-                            <h2 className={`text-lg font-black tracking-tight ${color}`}>{title}</h2>
-                            <button onClick={onClose} className="p-2 bg-white rounded-full hover:bg-slate-200 transition-colors text-slate-400 hover:text-slate-700 shadow-sm border border-slate-100">
-                                <SharedIcons.X className="w-4 h-4" />
-                            </button>
-                        </div>
-                        <div className="p-6 overflow-y-auto no-scrollbar" dir={t.lang === 'ar' ? 'rtl' : 'ltr'}>
-                            {content}
-                        </div>
-                        <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">YANSAB Document Control</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const Overview = ({ onNavigate, lang, setLang }) => {
-            const t = DICT[lang];
-            const isRTL = lang === 'ar';
-            const angles = [0, 72, 144, 216, 288]; const radius = 260;
-            const [activeGuide, setActiveGuide] = useState(null);
-
-            const STREAMS_DATA = [
-                { id: 1, label: t.streamElectrical, color: "#3B82F6", target: 'ELECTRICAL_DASHBOARD' },
-                { id: 2, label: t.streamNitrogen, color: "#FACC15", target: 'NITROGEN_DASHBOARD' },
-                { id: 3, label: t.streamAir, color: "#94A3B8" },
-                { id: 4, label: t.streamWater, color: "#94A3B8" },
-                { id: 5, label: t.streamSteam, color: "#94A3B8" }
-            ];
-
-            return (
-                <div className={`min-h-screen bg-white flex flex-col font-${isRTL ? 'arabic' : 'sans'} text-slate-800 animate-fade-in`} dir={isRTL ? 'rtl' : 'ltr'}>
-                    <div className="w-full flex justify-end p-6 absolute top-0 right-0 z-50">
-                        <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-full text-xs font-bold transition-colors shadow-sm border border-slate-200">
-                            <SharedIcons.Globe className="w-4 h-4" /> {lang === 'ar' ? 'English' : 'العربية'}
-                        </button>
-                    </div>
-
-                    <div className="flex-1 flex items-center justify-center p-8 overflow-hidden">
-                        <div className="relative w-full max-w-4xl aspect-square flex items-center justify-center">
-                            <div className="absolute w-[400px] h-[400px] border border-slate-50 rounded-full hub-ring flex items-center justify-center"><div className="w-[280px] h-[280px] border border-slate-100 rounded-full flex items-center justify-center bg-white shadow-inner"><h2 className="text-2xl font-light tracking-[0.8em] text-slate-300 uppercase select-none mr-[-0.8em]" dir="ltr">STREAMS</h2></div></div>
-                            {angles.map((angle, i) => { 
-                                const s = STREAMS_DATA[i]; 
-                                if (!s) return null; 
-                                const x = Math.sin((angle * Math.PI) / 180) * radius; 
-                                const y = -Math.cos((angle * Math.PI) / 180) * radius; 
-                                return (
-                                    <div key={s.id} className="absolute flex items-center justify-center z-10" style={{ transform: `translate(${x}px, ${y}px)` }}>
-                                        <OverviewPentagon stream={s} onClick={(st) => st.target && onNavigate(st.target)} onInfoClick={setActiveGuide} />
-                                    </div>
-                                ); 
-                            })}
-                        </div>
-                    </div>
-                    <GuidelinesModal streamId={activeGuide} onClose={() => setActiveGuide(null)} t={t} />
                 </div>
             );
         };
