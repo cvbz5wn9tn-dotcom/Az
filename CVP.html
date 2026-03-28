@@ -37,6 +37,8 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
+        .hub-ring { transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .no-jitter { backface-visibility: hidden; transform: translateZ(0); }
         .info-tooltip .tooltip-content {
             visibility: hidden; width: 280px; background-color: #1e293b; color: #fff;
             text-align: left; border-radius: 8px; padding: 12px; position: absolute;
@@ -48,6 +50,9 @@
         #error-display { display: none; color: #ef4444; padding: 20px; font-family: monospace; }
         .inline-input { transition: all 0.2s; }
         .inline-input:focus { box-shadow: 0 2px 0 0 #3b82f6; }
+        .smart-input { transition: all 0.3s ease; }
+        .smart-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+        .hide-arrows::-webkit-outer-spin-button, .hide-arrows::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="min-h-screen text-slate-800 antialiased selection:bg-[#1e3a8a] selection:text-white">
@@ -75,46 +80,99 @@
             StopCircle: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10" /><rect width="6" height="6" x="9" y="9" /></>} {...props} />,
             ArrowLeft: (props) => <SharedIcon path={<><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></>} {...props} />,
             CheckCircle2: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></>} {...props} />,
+            BarChart3: (props) => <SharedIcon path={<><path d="M3 3v18h18" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></>} {...props} />,
             Wind: (props) => <SharedIcon path={<><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></>} {...props} />,
-            Globe: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>} {...props} />
+            BookOpen: (props) => <SharedIcon path={<><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></>} {...props} />,
+            X: (props) => <SharedIcon path={<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>} {...props} />,
+            AlertTriangle: (props) => <SharedIcon path={<><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></>} {...props} />,
+            CheckCircle: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></>} {...props} />,
+            XCircle: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></>} {...props} />,
+            RotateCcw: (props) => <SharedIcon path={<><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></>} {...props} />,
+            Cpu: (props) => <SharedIcon path={<><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 14h3"/><path d="M1 9h3"/><path d="M1 14h3"/></>} {...props} />,
+            Globe: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>} {...props} />,
+            ExternalLink: (props) => <SharedIcon path={<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></>} {...props} />
         };
 
         const DICT = {
             en: {
                 lang: 'en',
-                streamsTitle: "STREAMS",
-                streamElectrical: "ELECTRICAL", streamNitrogen: "NITROGEN",
+                streamsTitle: "STREAMS", guidelinesTitle: "SOP & Guidelines",
+                streamElectrical: "ELECTRICAL", streamNitrogen: "NITROGEN", streamAir: "AIR", streamWater: "WATER", streamSteam: "STEAM",
                 titleElec: "Electrical Peak Simulator", subtitleElec: "Stream 01 Decision Support",
                 currentPeak: "Current Peak Load (MW)", editHint: "Click to edit base load",
                 safeZone: "< 112 MW (Safe)", dangerZone: "112 - 114 MW (Danger)", criticalZone: "> 114 MW (Critical)",
                 assistantTitle: "Smart Operation Assistant", assistantSub: "Automated 'What If' Scenarios", reset: "Reset",
+                critAlert: "Critical Overload", critDesc: "Current load exceeds 114 MW. Do not energize new equipment. Action is required to balance the grid below 112 MW.",
+                warnAlert: "Danger Zone", warnDesc: "Current load is in the danger zone (112-114 MW).",
+                urgentQ: "Is the energization request strictly URGENT?",
+                yesUrgent: "Yes, Urgent", noPostpone: "No, Postpone",
+                postponed: "Operation Postponed", postponedDesc: "Please delay the request until grid load stabilizes.",
+                stableAlert: "Grid is Stable",
                 addLoadPrompt: "Expected load of the new equipment (MW):", simulateBtn: "Simulate Impact",
-                safeOp: "Safe to Energize", 
-                safeOpDesc: "Expected peak will remain within safe limits ({val} MW). Safe to proceed.",
+                safeOp: "Safe to Energize", safeOpDesc: "Expected peak is under safe limits ({val} MW). Safe to proceed.",
                 expHighAlert: "Expected Peak is High", expHighDesc: "Adding this equipment pushes the grid to Danger Zone (112-114 MW).",
                 expCritAlert: "Expected Peak is Critical", expCritDesc: "Adding this equipment exceeds the absolute limit (>114 MW).",
-                mw: "MW",
+                actionReq: "Grid Balancing Required", targetRed: "Capacity Needed (<112MW):",
+                shedPrompt: "Enter load to SHED (MW):", applyShed: "Apply Shedding",
+                genReq: "Increase Generation", genReqDesc: "Shedding is insufficient. Increase internal generation by:",
+                genNote: "Max capacity per generator is 21 MW.",
+                success: "Grid Secured", successDesc: "Grid is balanced. Safe to proceed.", mw: "MW",
+                genControl: "Internal Generators Control", gen: "Gen", maxGen: "Max 21",
                 titleNitro: "Nitrogen Dashboard", subtitleNitro: "Stream 02 Performance",
-                nitroOverview: "Nitrogen Overview",
-                attachExcel: "Attach Excel", syncStop: "Stop Sync"
+                nitroOverview: "Nitrogen Overview", live: "LIVE", sim: "SIMULATOR",
+                sysDemand: "System Demand", designPeak: "Design Peak", dailyAlloc: "Daily Allocation",
+                consGauges: "Consumption Gauges", total: "Total", plantLoads: "Plant Loads", attachExcel: "Attach Excel", syncStop: "Stop Sync",
+                nitroAsstTitle: "Nitrogen Smart Assistant", nitroAsstSub: "Demand Simulation", nitroSimBtn: "Simulate Request",
+                nitroAddPrompt: "Enter requested quantity (Ton/h):", nitroSafe: "Safe to Proceed",
+                nitroSafeDesc: "Expected total consumption will remain under the 31 Ton/h threshold.",
+                nitroWarn: "Daily Limit Risk", nitroWarnDesc: "Adding this request pushes total consumption over 31 Ton/h. Sustaining this rate for 24 hours risks exceeding the daily limit (744 Ton).",
+                attachHelp: "Attachment Instructions",
+                attachSteps: [
+                    "Open Excel sheet.",
+                    "Press Update then save the file.",
+                    "Attach the excel sheet and keep the file open.",
+                    "Every time you want to update the data, update the excel and save."
+                ]
             },
             ar: {
                 lang: 'ar',
-                streamsTitle: "المسارات",
-                streamElectrical: "الكهرباء", streamNitrogen: "النيتروجين",
-                titleElec: "محاكي ذروة الكهرباء", subtitleElec: "المسار 01: دعم القرار",
+                streamsTitle: "المسارات", guidelinesTitle: "الأدلة الإرشادية",
+                streamElectrical: "الكهرباء", streamNitrogen: "النيتروجين", streamAir: "الهواء", streamWater: "المياه", streamSteam: "البخار",
+                titleElec: "Electrical Peak Simulator", subtitleElec: "Stream 01 Decision Support",
                 currentPeak: "حمل الذروة للشبكة الفعلي", editHint: "انقر لتعديل الحمل الأساسي",
                 safeZone: "أقل من 112 (آمن)", dangerZone: "112 - 114 (خطر)", criticalZone: "أعلى من 114 (حرج)",
                 assistantTitle: "المساعد التشغيلي الذكي", assistantSub: "محاكاة السيناريوهات المؤتمتة", reset: "إعادة تقييم",
+                critAlert: "تجاوز الحد الحرج", critDesc: "الحمل الحالي يتجاوز 114 ميجاوات. يجب خفض الحمل أو زيادة التوليد لتأمين الشبكة (أقل من 112). لا تقم بتشغيل أي معدة.",
+                warnAlert: "منطقة الخطر", warnDesc: "الحمل الحالي مرتفع جداً ويقع في منطقة الخطر (112-114 ميجاوات).",
+                urgentQ: "هل طلب التشغيل يعتبر أمراً طارئاً وضرورياً جداً؟",
+                yesUrgent: "نعم، ضروري", noPostpone: "لا، يمكن التأجيل",
+                postponed: "تم تأجيل التشغيل", postponedDesc: "بما أن الطلب غير ضروري، يرجى تأجيل التشغيل وجدولته لاحقاً عندما يكون الحمل أقل من 114 للحفاظ على استقرار الشبكة.",
+                stableAlert: "الشبكة مستقرة",
                 addLoadPrompt: "أدخل الاستهلاك المتوقع للمعدة المراد تشغيلها:", simulateBtn: "محاكاة التأثير",
-                safeOp: "تصريح بالتشغيل (آمن)", 
-                safeOpDesc: "الاستهلاك الكلي المتوقع سيبقى ضمن الحدود الآمنة ({val} ميجاوات). يمكنك المضي قدماً في التشغيل.",
+                safeOp: "تصريح بالتشغيل (آمن)", safeOpDesc: "الاستهلاك الكلي المتوقع سيبقى ضمن الحدود الآمنة ({val} ميجاوات). يمكنك المضي قدماً في التشغيل.",
                 expHighAlert: "تنبيه: الحمل المتوقع مرتفع", expHighDesc: "تشغيل هذه المعدة سيدخل الشبكة في منطقة الخطر (112-114).",
                 expCritAlert: "تنبيه: الحمل المتوقع حرج", expCritDesc: "تشغيل هذه المعدة سيتجاوز الحد الأقصى المسموح للشبكة (114+).",
-                mw: "ميجاوات",
-                titleNitro: "لوحة النيتروجين", subtitleNitro: "المسار 02: الأداء",
-                nitroOverview: "نظرة عامة للنيتروجين",
-                attachExcel: "إرفاق ملف إكسل", syncStop: "إيقاف المزامنة"
+                actionReq: "إجراء مطلوب لموازنة الشبكة", targetRed: "الطاقة المطلوبة لتأمين الشبكة (<112):",
+                shedPrompt: "أدخل استهلاك المعدة المراد إطفاؤها (Load Shedding):", applyShed: "تأكيد الإطفاء",
+                genReq: "يتطلب رفع التوليد الداخلي", genReqDesc: "عملية الإطفاء غير كافية. لتأمين الشبكة، يجب زيادة التوليد بمقدار:",
+                genNote: "ملاحظة هامة: أقصى طاقة للمولد الواحد هي 21 ميجاوات.",
+                success: "تم تأمين الشبكة", successDesc: "الشبكة الآن متزنة وآمنة. يمكنك المضي قدماً في التشغيل.", mw: "ميجاوات",
+                genControl: "التحكم بالمولدات الداخلية", gen: "Gen", maxGen: "حد أقصى 21",
+                titleNitro: "Nitrogen Dashboard", subtitleNitro: "Stream 02 Performance",
+                nitroOverview: "نظرة عامة للنيتروجين", live: "مباشر", sim: "محاكي",
+                sysDemand: "طلب النظام (System Demand)", designPeak: "ذروة التصميم (Peak)", dailyAlloc: "المخصص اليومي",
+                consGauges: "عدادات الاستهلاك", total: "الإجمالي", plantLoads: "أحمال المصانع", attachExcel: "إرفاق ملف إكسل", syncStop: "إيقاف المزامنة",
+                nitroAsstTitle: "المساعد الذكي للنيتروجين", nitroAsstSub: "محاكاة طلبات الاستهلاك", nitroSimBtn: "محاكاة الكمية",
+                nitroAddPrompt: "أدخل الكمية المطلوبة (طن/ساعة):", nitroSafe: "آمن للتشغيل",
+                nitroSafeDesc: "الاستهلاك الكلي المتوقع سيبقى ضمن الحدود الآمنة (أقل من 31 طن/ساعة).",
+                nitroWarn: "خطر تجاوز الحد اليومي", nitroWarnDesc: "الكمية المطلوبة سترفع الاستهلاك الكلي ليتجاوز 31 طن/ساعة. الاستمرار بهذا المعدل لمدة 24 ساعة سيعرضنا لتجاوز الحد اليومي المسموح (744 طن).",
+                attachHelp: "تعليمات الإرفاق",
+                attachSteps: [
+                    "افتح ملف الإكسل.",
+                    "اضغط على تحديث (Update) ثم احفظ الملف.",
+                    "قم بإرفاق ملف الإكسل وأبقِ الملف مفتوحاً.",
+                    "في كل مرة تريد تحديث البيانات، قم بتحديث الإكسل واحفظه."
+                ]
             }
         };
 
@@ -136,6 +194,26 @@
             </header>
         );
 
+        const FileUploader = ({ onFileUpload, t, onShowHelp }) => {
+            const [isSyncing, setIsSyncing] = useState(false); const intervalRef = useRef(null); const lastModifiedRef = useRef(0);
+            const startLiveSync = async () => {
+                try {
+                    const [handle] = await window.showOpenFilePicker(); const file = await handle.getFile(); setIsSyncing(true); lastModifiedRef.current = file.lastModified; await onFileUpload(file);
+                    intervalRef.current = setInterval(async () => { const currentFile = await handle.getFile(); if (currentFile.lastModified > lastModifiedRef.current) { lastModifiedRef.current = currentFile.lastModified; await onFileUpload(currentFile); } }, 2000);
+                } catch (e) { console.error("Sync error", e); }
+            };
+            return (
+                <div className="flex items-center gap-2">
+                    <button onClick={onShowHelp} title={t.attachHelp} className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition-colors focus:outline-none">
+                        <SharedIcons.Info className="w-5 h-5" />
+                    </button>
+                    <div className="info-tooltip relative flex items-center">
+                        {isSyncing ? <button onClick={() => {clearInterval(intervalRef.current); setIsSyncing(false);}} className="flex items-center px-4 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg text-sm font-bold animate-pulse"><SharedIcons.StopCircle className="w-4 h-4 mr-2" /> {t.syncStop}</button> : <button onClick={startLiveSync} className="flex items-center px-5 py-2.5 bg-blue-900 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-blue-800 transition-all"><SharedIcons.FolderInput className="w-4 h-4 mr-2" /> {t.attachExcel}</button>}
+                    </div>
+                </div>
+            );
+        };
+
         const InlineEditable = ({ value, unit, onSave }) => {
             const [isEditing, setIsEditing] = useState(false);
             const [tempVal, setTempVal] = useState(value);
@@ -144,15 +222,198 @@
             if (isEditing) {
                 return (
                     <div className="flex items-center gap-1 animate-fade-in">
-                        <input autoFocus type="number" value={tempVal} onChange={e => setTempVal(e.target.value)} onBlur={commit} onKeyDown={e => e.key === 'Enter' && commit()} className="w-20 text-center text-lg font-black text-blue-900 bg-blue-50/50 outline-none inline-input px-2 py-1 rounded" dir="ltr" />
-                        {unit && <span className="text-sm font-bold text-slate-500">{unit}</span>}
+                        <input autoFocus type="number" value={tempVal} onChange={e => setTempVal(e.target.value)} onBlur={commit} onKeyDown={e => e.key === 'Enter' && commit()} className="w-16 text-center text-xs font-black text-blue-900 bg-blue-50/50 outline-none inline-input px-1 py-0.5 rounded" dir="ltr" />
+                        {unit && <span className="text-[10px] font-bold text-slate-500">{unit}</span>}
                     </div>
                 );
             }
             return (
-                <div onClick={() => setIsEditing(true)} className="flex items-center gap-1 cursor-pointer group px-2 py-1 rounded hover:bg-blue-50 transition-colors" title="Click to edit">
-                    <span className="text-2xl font-black text-slate-700 group-hover:text-blue-600 border-b-2 border-dashed border-slate-300 group-hover:border-blue-500 transition-colors" dir="ltr">{value}</span>
-                    {unit && <span className="text-sm font-bold text-slate-500">{unit}</span>}
+                <div onClick={() => setIsEditing(true)} className="flex items-center gap-1 cursor-pointer group px-2 py-0.5 rounded hover:bg-blue-50 transition-colors" title="Click to edit">
+                    <span className="text-[11px] font-black text-slate-700 group-hover:text-blue-600 border-b border-dashed border-slate-300 group-hover:border-blue-500 transition-colors" dir="ltr">{value}</span>
+                    {unit && <span className="text-[10px] font-bold text-slate-500">{unit}</span>}
+                </div>
+            );
+        };
+
+        const ElectricalSmartAssistant = ({ currentLoad, lang }) => {
+            const t = DICT[lang];
+            const TARGET_SAFE = 111.9; 
+            
+            const [phase, setPhase] = useState('INIT'); 
+            const [addedLoad, setAddedLoad] = useState('');
+            const [shedLoad, setShedLoad] = useState('');
+            const [expectedLoad, setExpectedLoad] = useState(0);
+
+            useEffect(() => { setPhase('INIT'); setAddedLoad(''); setShedLoad(''); }, [currentLoad]);
+
+            const isDangerCurrent = currentLoad >= 112 && currentLoad < 114;
+            const isCritCurrent = currentLoad >= 114;
+            const activeExpected = phase === 'INIT' ? currentLoad : expectedLoad;
+            
+            const targetTotalToReduce = isDangerCurrent && phase === 'ACTION_REQ' ? currentLoad : activeExpected;
+            const requiredReduction = Math.max(0, targetTotalToReduce - TARGET_SAFE);
+            const remainingReduction = Math.max(0, requiredReduction - Number(shedLoad || 0));
+
+            const renderPhase = () => {
+                if (phase === 'INIT') {
+                    if (isCritCurrent) {
+                        return (
+                            <div className="animate-fade-in text-center">
+                                <SharedIcons.AlertTriangle className="w-16 h-16 text-rose-500 mx-auto mb-4 drop-shadow-md" />
+                                <h3 className="text-2xl font-black text-rose-600 mb-2">{t.critAlert}</h3>
+                                <p className="text-slate-600 mb-8 max-w-sm mx-auto">{t.critDesc}</p>
+                                <button onClick={() => { setExpectedLoad(currentLoad); setPhase('ACTION_REQ'); }} className="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">{t.actionReq}</button>
+                            </div>
+                        );
+                    } else if (isDangerCurrent) {
+                        return (
+                            <div className="animate-fade-in text-center">
+                                <SharedIcons.Activity className="w-16 h-16 text-amber-500 mx-auto mb-4 drop-shadow-md" />
+                                <h3 className="text-2xl font-black text-amber-600 mb-2">{t.warnAlert}</h3>
+                                <p className="text-slate-600 mb-8 max-w-sm mx-auto">{t.warnDesc}<br/><br/><strong className="text-slate-800">{t.urgentQ}</strong></p>
+                                <div className="flex gap-4 justify-center">
+                                    <button onClick={() => setPhase('INPUT_ADDED')} className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-sm w-44">{t.yesUrgent}</button>
+                                    <button onClick={() => setPhase('POSTPONED')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-xl transition-all w-44">{t.noPostpone}</button>
+                                </div>
+                            </div>
+                        );
+                    } else {
+                        return (
+                            <div className="animate-fade-in text-center">
+                                <SharedIcons.CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
+                                <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.stableAlert}</h3>
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto mt-6">
+                                    <label className="block text-sm font-bold text-slate-600 mb-4">{t.addLoadPrompt}</label>
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <input type="number" value={addedLoad} onChange={e => setAddedLoad(e.target.value)} placeholder="0.0" className="w-full text-center text-3xl font-black text-blue-900 bg-blue-50/50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
+                                        <span className="text-lg font-bold text-slate-400">{t.mw}</span>
+                                    </div>
+                                    <button onClick={() => { if(!addedLoad || isNaN(addedLoad)) return; setExpectedLoad(currentLoad + Number(addedLoad)); setPhase('EVAL_EXPECTED'); }} disabled={!addedLoad} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl transition-all shadow-md">{t.simulateBtn}</button>
+                                </div>
+                            </div>
+                        );
+                    }
+                }
+
+                if (phase === 'INPUT_ADDED') {
+                    return (
+                        <div className="animate-fade-in text-center">
+                            <h3 className="text-xl font-black text-blue-900 mb-6">{t.addLoadPrompt}</h3>
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <input type="number" value={addedLoad} onChange={e => setAddedLoad(e.target.value)} placeholder="0.0" className="w-full text-center text-3xl font-black text-blue-900 bg-blue-50/50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
+                                    <span className="text-lg font-bold text-slate-400">{t.mw}</span>
+                                </div>
+                                <button onClick={() => { if(!addedLoad || isNaN(addedLoad)) return; setExpectedLoad(currentLoad + Number(addedLoad)); setPhase('EVAL_EXPECTED'); }} disabled={!addedLoad} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl transition-all shadow-md">{t.simulateBtn}</button>
+                            </div>
+                        </div>
+                    );
+                }
+
+                if (phase === 'POSTPONED') {
+                    return (
+                        <div className="animate-fade-in text-center">
+                            <SharedIcons.CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
+                            <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.postponed}</h3>
+                            <p className="text-slate-600 mb-8 max-w-sm mx-auto">{t.postponedDesc}</p>
+                            <button onClick={() => setPhase('INIT')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition-all shadow-sm">{t.reset}</button>
+                        </div>
+                    );
+                }
+
+                if (phase === 'EVAL_EXPECTED') {
+                    if (activeExpected < 112) {
+                        return (
+                            <div className="animate-fade-in text-center">
+                                <SharedIcons.CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
+                                <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.safeOp}</h3>
+                                <p className="text-emerald-700 mb-8 max-w-sm mx-auto">{t.safeOpDesc.replace('{val}', activeExpected.toFixed(1))}</p>
+                                <button onClick={() => {setPhase('INIT'); setAddedLoad('');}} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition-all shadow-sm">{t.reset}</button>
+                            </div>
+                        );
+                    } else if (activeExpected >= 112 && activeExpected < 114) {
+                        return (
+                            <div className="animate-fade-in text-center">
+                                <SharedIcons.AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4 drop-shadow-md" />
+                                <h3 className="text-2xl font-black text-amber-600 mb-2">{t.expHighAlert}</h3>
+                                <p className="text-amber-700 mb-8 max-w-sm mx-auto">{t.expHighDesc} ({activeExpected.toFixed(1)} {t.mw})</p>
+                                <button onClick={() => setPhase('ACTION_REQ')} className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">{t.actionReq}</button>
+                            </div>
+                        );
+                    } else {
+                        return (
+                            <div className="animate-fade-in text-center">
+                                <SharedIcons.StopCircle className="w-16 h-16 text-rose-500 mx-auto mb-4 drop-shadow-md" />
+                                <h3 className="text-2xl font-black text-rose-600 mb-2">{t.expCritAlert}</h3>
+                                <p className="text-rose-700 mb-8 max-w-sm mx-auto">{t.expCritDesc} ({activeExpected.toFixed(1)} {t.mw})</p>
+                                <button onClick={() => setPhase('ACTION_REQ')} className="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">{t.actionReq}</button>
+                            </div>
+                        );
+                    }
+                }
+
+                if (phase === 'ACTION_REQ') {
+                    if (remainingReduction <= 0) {
+                        return (
+                            <div className="animate-fade-in text-center">
+                                <SharedIcons.CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
+                                <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.success}</h3>
+                                <p className="text-emerald-700 mb-8 max-w-sm mx-auto">{t.successDesc}</p>
+                                <button onClick={() => {setPhase('INIT'); setShedLoad(''); setAddedLoad('');}} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition-all shadow-sm">{t.reset}</button>
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <div className="animate-fade-in max-w-md mx-auto">
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 mb-6">
+                                <div className="flex justify-between items-center mb-4">
+                                    <span className="font-bold text-slate-700">{t.targetRed}</span>
+                                    <span className="text-xl font-black text-rose-600 bg-rose-50 px-3 py-1 rounded-lg" dir="ltr">{remainingReduction.toFixed(1)} {t.mw}</span>
+                                </div>
+                                <div className="mt-4 pt-4 border-t border-slate-100">
+                                    <label className="block text-sm font-bold text-slate-600 mb-2">{t.shedPrompt}</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="number" value={shedLoad} onChange={e => setShedLoad(e.target.value)} placeholder="0.0" className="flex-1 text-center text-xl font-bold text-blue-900 bg-blue-50/50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                                <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><SharedIcons.Cpu className="w-5 h-5"/> {t.genReq}</h4>
+                                <p className="text-sm text-blue-700 mb-4">{t.genReqDesc}</p>
+                                <div className="flex justify-center mb-4">
+                                    <span className="text-2xl font-black text-blue-800 bg-white px-4 py-2 rounded-xl shadow-sm border border-blue-100" dir="ltr">{remainingReduction.toFixed(1)} {t.mw}</span>
+                                </div>
+                                <div className="text-xs text-blue-600/80 bg-blue-100/50 p-3 rounded-lg flex items-start gap-2">
+                                    <SharedIcons.Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                                    <span>{t.genNote}</span>
+                                </div>
+                            </div>
+                            <div className="mt-6 flex justify-center">
+                                <button onClick={() => {setPhase('INIT'); setShedLoad(''); setAddedLoad('');}} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-6 rounded-xl transition-all shadow-sm text-sm">{t.reset}</button>
+                            </div>
+                        </div>
+                    );
+                }
+            };
+
+            return (
+                <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full opacity-50 pointer-events-none"></div>
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-3 rounded-2xl shadow-md text-white">
+                            <SharedIcons.Activity className="w-8 h-8" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-black text-slate-800">{t.assistantTitle}</h2>
+                            <p className="text-blue-600 font-medium">{t.assistantSub}</p>
+                        </div>
+                    </div>
+                    <div className="min-h-[320px] flex flex-col justify-center">
+                        {renderPhase()}
+                    </div>
                 </div>
             );
         };
@@ -184,87 +445,40 @@
         const ElectricalDashboard = ({ onBack, lang, setLang }) => {
             const t = DICT[lang];
             const [baseLoad, setBaseLoad] = useState(110);
-            const [newLoad, setNewLoad] = useState('');
-            const [simulated, setSimulated] = useState(false);
-
-            const expectedPeak = baseLoad + (parseFloat(newLoad) || 0);
-
-            const handleSimulate = () => {
-                if(newLoad !== '') setSimulated(true);
-            };
 
             return (
                 <div dir={lang === 'ar' ? 'rtl' : 'ltr'} className={`min-h-screen bg-slate-50 ${lang === 'ar' ? 'font-arabic' : 'font-sans'}`}>
                     <DashboardHeader title={t.titleElec} subtitle={t.subtitleElec} icon={SharedIcons.Zap} onBack={onBack} lang={lang} setLang={setLang} />
                     
-                    <div className="max-w-4xl mx-auto p-4 mt-6 animate-fade-in">
-                        {/* Current Load Section */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-6 flex flex-col items-center">
-                            <h3 className="text-slate-500 font-bold mb-2 uppercase tracking-wider">{t.currentPeak}</h3>
-                            <InlineEditable value={baseLoad} unit={t.mw} onSave={(val) => { setBaseLoad(val); setSimulated(false); }} />
-                            <p className="text-xs text-slate-400 mt-2">{t.editHint}</p>
+                    <div className="max-w-6xl mx-auto p-6 mt-6 animate-fade-in grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        
+                        <div className="lg:col-span-4 space-y-6">
+                            <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 flex flex-col items-center text-center relative overflow-hidden">
+                                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-50 rounded-full blur-2xl opacity-60 pointer-events-none"></div>
+                                <h3 className="text-slate-500 font-bold mb-4 uppercase tracking-widest text-sm">{t.currentPeak}</h3>
+                                <div className="bg-slate-50 p-6 rounded-2xl w-full flex justify-center mb-4 border border-slate-100">
+                                    <InlineEditable value={baseLoad} unit={t.mw} onSave={(val) => { setBaseLoad(val); }} />
+                                </div>
+                                <p className="text-xs text-slate-400 bg-slate-100 px-3 py-1 rounded-full">{t.editHint}</p>
+                            </div>
+                            
+                            <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 text-emerald-700 text-sm font-bold">
+                                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500"></div>{t.safeZone}</div>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50 text-amber-700 text-sm font-bold">
+                                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-500"></div>{t.dangerZone}</div>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 rounded-xl bg-rose-50 text-rose-700 text-sm font-bold">
+                                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-rose-500"></div>{t.criticalZone}</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Smart Assistant Section */}
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border-t-4 border-blue-900">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="bg-blue-100 p-2 rounded-lg text-blue-900"><SharedIcons.Activity className="w-6 h-6" /></div>
-                                <div>
-                                    <h3 className="font-bold text-xl text-slate-800">{t.assistantTitle}</h3>
-                                    <p className="text-sm text-slate-500">{t.assistantSub}</p>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col md:flex-row gap-4 items-end mb-8">
-                                <div className="flex-1 w-full">
-                                    <label className="block text-sm font-bold text-slate-700 mb-2">{t.addLoadPrompt}</label>
-                                    <input 
-                                        type="number" 
-                                        value={newLoad} 
-                                        onChange={e => {setNewLoad(e.target.value); setSimulated(false);}} 
-                                        className="w-full border-2 border-slate-200 p-3 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors text-lg" 
-                                        placeholder="0"
-                                    />
-                                </div>
-                                <button 
-                                    onClick={handleSimulate} 
-                                    className="w-full md:w-auto bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all active:scale-95"
-                                >
-                                    {t.simulateBtn}
-                                </button>
-                            </div>
-
-                            {/* Simulation Result Area */}
-                            {simulated && (
-                                <div className="animate-fade-in">
-                                    {expectedPeak < 112 ? (
-                                        <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-xl flex gap-4 items-start">
-                                            <SharedIcons.CheckCircle2 className="w-8 h-8 text-emerald-500 flex-shrink-0" />
-                                            <div>
-                                                <h4 className="font-bold text-emerald-800 text-lg">{t.safeOp}</h4>
-                                                {/* استخدام الاستبدال {val} هنا لعرض القيمة المتوقعة */}
-                                                <p className="text-emerald-600 mt-1">{t.safeOpDesc.replace('{val}', expectedPeak.toFixed(1))}</p>
-                                            </div>
-                                        </div>
-                                    ) : expectedPeak <= 114 ? (
-                                        <div className="bg-amber-50 border border-amber-200 p-6 rounded-xl flex gap-4 items-start">
-                                            <SharedIcons.Info className="w-8 h-8 text-amber-500 flex-shrink-0" />
-                                            <div>
-                                                <h4 className="font-bold text-amber-800 text-lg">{t.expHighAlert}</h4>
-                                                <p className="text-amber-700 mt-1">{t.expHighDesc} ({expectedPeak.toFixed(1)} {t.mw})</p>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="bg-rose-50 border border-rose-200 p-6 rounded-xl flex gap-4 items-start">
-                                            <SharedIcons.StopCircle className="w-8 h-8 text-rose-500 flex-shrink-0" />
-                                            <div>
-                                                <h4 className="font-bold text-rose-800 text-lg">{t.expCritAlert}</h4>
-                                                <p className="text-rose-700 mt-1">{t.expCritDesc} ({expectedPeak.toFixed(1)} {t.mw})</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                        <div className="lg:col-span-8">
+                            <ElectricalSmartAssistant currentLoad={baseLoad} lang={lang} />
                         </div>
                     </div>
                 </div>
@@ -280,7 +494,6 @@
                         <div className="bg-white p-10 rounded-2xl shadow border border-slate-200">
                             <SharedIcons.Wind className="w-20 h-20 text-blue-200 mx-auto mb-4" />
                             <h2 className="text-2xl font-bold text-slate-700">{t.nitroOverview}</h2>
-                            <p className="text-slate-500 mt-2">مكون النيتروجين يعمل بشكل طبيعي... (واجهة العرض الخاصة بالنيتروجين)</p>
                         </div>
                     </div>
                 </div>
