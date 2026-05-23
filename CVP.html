@@ -3,532 +3,534 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YANSAB Operational Dashboards</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], arabic: ['Tajawal', 'sans-serif'] },
-                    colors: {
-                        brand: { blue: '#1e3a8a', yellow: '#fbbf24', dark: '#111827' },
-                        status: { on: '#10b981', off: '#9ca3af', warning: '#f59e0b', danger: '#ef4444' }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-    
+    <title>AI & Energy Intelligence Roadmap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @keyframes fade-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 0.4s ease-out forwards; }
-        @keyframes modal-pop { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
-        .animate-modal { animation: modal-pop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
-        .hub-ring { transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        .no-jitter { backface-visibility: hidden; transform: translateZ(0); }
-        .info-tooltip .tooltip-content {
-            visibility: hidden; width: 280px; background-color: #1e293b; color: #fff;
-            text-align: left; border-radius: 8px; padding: 12px; position: absolute;
-            z-index: 50; right: 0; top: 110%; opacity: 0; transition: opacity 0.3s;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); font-size: 11px; line-height: 1.6;
+        :root {
+            --bg-main: #0B1120;
+            --bg-panel: #131C31;
+            --bg-hover: #1E293B;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --accent-blue: #3B82F6;
+            --accent-green: #10B981;
+            --accent-purple: #8B5CF6;
+            --border-color: #1E293B;
+            --font-main: 'Inter', sans-serif;
         }
-        .info-tooltip:hover .tooltip-content { visibility: visible; opacity: 1; }
-        .loading-screen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
-        #error-display { display: none; color: #ef4444; padding: 20px; font-family: monospace; }
-        .inline-input { transition: all 0.2s; }
-        .inline-input:focus { box-shadow: 0 2px 0 0 #3b82f6; }
-        .smart-input { transition: all 0.3s ease; }
-        .smart-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
-        .hide-arrows::-webkit-outer-spin-button, .hide-arrows::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 260px;
+            background-color: #0d1527;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            gap: 10px;
+        }
+        .brand .logo { color: var(--accent-blue); font-size: 24px; font-weight: 700; }
+        .brand .title { font-size: 12px; color: var(--text-secondary); line-height: 1.2; }
+
+        .profile-section {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .profile-pic {
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-blue);
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+        .profile-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+        .profile-role { font-size: 12px; color: var(--text-secondary); }
+        .status-badge {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            display: inline-block;
+            margin-top: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-menu { padding: 20px 10px; flex-grow: 1; }
+        .nav-item {
+            display: flex; align-items: center; gap: 15px;
+            padding: 10px 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+        }
+        .nav-item:hover { background-color: var(--bg-hover); color: var(--text-primary); }
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(59,130,246,0.15) 0%, transparent 100%);
+            color: var(--accent-blue);
+            border-left: 3px solid var(--accent-blue);
+        }
+        .nav-item i { width: 20px; text-align: center; }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 25px 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Topbar */
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .welcome h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .welcome p { font-size: 13px; color: var(--text-secondary); }
+        .top-actions { display: flex; gap: 15px; align-items: center; }
+        .date-picker {
+            background-color: var(--bg-panel); border: 1px solid var(--border-color);
+            padding: 8px 15px; border-radius: 6px; font-size: 13px; color: var(--text-secondary);
+        }
+        .icon-btn {
+            background-color: var(--bg-panel); border: 1px solid var(--border-color);
+            width: 35px; height: 35px; border-radius: 6px;
+            display: flex; justify-content: center; align-items: center;
+            color: var(--text-secondary); cursor: pointer;
+        }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .panel-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; font-size: 14px; font-weight: 600;
+        }
+        .panel-link { color: var(--accent-blue); font-size: 12px; text-decoration: none; }
+
+        /* --- Row 1: KPIs --- */
+        .kpi-row { grid-column: span 12; display: flex; gap: 15px; }
+        .kpi-card {
+            background-color: var(--bg-panel); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 15px; flex: 1; display: flex; flex-direction: column; gap: 10px;
+        }
+        .kpi-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); }
+        .kpi-value { font-size: 24px; font-weight: 700; }
+        
+        /* Overall Progress KPI specifically */
+        .overall-kpi { flex: 1.5; display: flex; align-items: center; gap: 20px; }
+        .circular-chart {
+            width: 70px; height: 70px; border-radius: 50%;
+            background: conic-gradient(var(--accent-green) 28%, #1E293B 0);
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
+        }
+        .circular-chart::before {
+            content: ""; width: 56px; height: 56px; background-color: var(--bg-panel);
+            border-radius: 50%; position: absolute;
+        }
+        .circular-val { position: relative; font-size: 18px; font-weight: 700; }
+        .overall-details { font-size: 12px; }
+        .badge-green { background: rgba(16,185,129,0.1); color: var(--accent-green); padding: 3px 8px; border-radius: 4px; font-size: 10px; margin-top: 5px; display: inline-block;}
+
+        /* Progress bars inside KPIs */
+        .progress-sm { height: 4px; background: var(--border-color); border-radius: 2px; margin-top: auto; overflow: hidden;}
+        .progress-sm-fill { height: 100%; }
+
+        /* --- Row 2: Overviews & Trends --- */
+        .overview-panel { grid-column: span 5; }
+        .overview-cards { display: flex; gap: 10px; margin-top: 15px;}
+        .year-card {
+            background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 15px; flex: 1; text-align: center;
+        }
+        .year-title { font-size: 11px; color: var(--accent-green); margin-bottom: 5px;}
+        .year-desc { font-size: 10px; color: var(--text-secondary); height: 24px;}
+        .ring-sm {
+            width: 50px; height: 50px; border-radius: 50%; margin: 10px auto;
+            display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: 600;
+        }
+        .ring-1 { background: conic-gradient(var(--accent-green) 28%, #1E293B 0); }
+        .ring-2 { background: conic-gradient(var(--accent-blue) 15%, #1E293B 0); }
+        .ring-3 { background: conic-gradient(var(--accent-purple) 5%, #1E293B 0); }
+        .ring-inner { width: 40px; height: 40px; background: var(--bg-panel); border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        .trend-panel { grid-column: span 7; }
+        .chart-container { height: 200px; width: 100%; }
+
+        /* --- Row 3: Tasks, Radar, Projects --- */
+        .tasks-panel { grid-column: span 4; }
+        .radar-panel { grid-column: span 4; }
+        .projects-panel { grid-column: span 4; }
+
+        .list-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-info h4 { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+        .list-info p { font-size: 11px; color: var(--text-secondary); }
+        
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px;}
+        .status-completed { color: var(--accent-green); font-size: 12px;}
+        .status-progress { color: var(--accent-blue); font-size: 12px;}
+        .status-notstarted { color: var(--text-secondary); font-size: 12px;}
+
+        /* --- Row 4: Bottom Widgets --- */
+        .week-summary { grid-column: span 5; display: flex; gap: 15px;}
+        .summary-box { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; flex: 1; display: flex; align-items: center; justify-content: space-between;}
+        
+        .quote-panel { grid-column: span 4; display: flex; align-items: center; font-style: italic; color: var(--text-secondary); font-size: 13px; line-height: 1.5; padding: 20px;}
+        .links-panel { grid-column: span 3; display: flex; justify-content: space-around; align-items: center;}
+        .link-icon { text-align: center; color: var(--text-secondary); font-size: 12px; cursor: pointer;}
+        .link-icon i { font-size: 18px; margin-bottom: 5px; display: block; background: var(--bg-main); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);}
+
     </style>
 </head>
-<body class="min-h-screen text-slate-800 antialiased selection:bg-[#1e3a8a] selection:text-white">
-    
-    <div id="loader" class="loading-screen">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-900 border-t-transparent mb-4"></div>
-        <p class="font-bold text-slate-600">Initializing Dashboard...</p>
-        <div id="error-display"></div>
-    </div>
+<body>
 
-    <div id="root"></div>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo"><i class="fa-solid fa-wave-square"></i></div>
+            <div class="title">Career Roadmap<br><span style="color:#64748b;">AI Infrastructure & Energy Intelligence</span></div>
+        </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
-        
-        const SharedIcon = ({ path, className, ...props }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{path}</svg>
-        );
+        <div class="profile-section">
+            <img src="https://via.placeholder.com/70" alt="Profile" class="profile-pic">
+            <div class="profile-name">Abdulaziz Alamri</div>
+            <div class="profile-role">Electrical Reliability Engineer</div>
+            <div class="status-badge">In Transition</div>
+        </div>
 
-        const SharedIcons = {
-            Zap: (props) => <SharedIcon path={<><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></>} {...props} />,
-            Activity: (props) => <SharedIcon path={<><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></>} {...props} />,
-            Info: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></>} {...props} />,
-            FolderInput: (props) => <SharedIcon path={<><path d="M2 9h10v5L2 9Z" /><path d="M22 13v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v2" /></>} {...props} />,
-            StopCircle: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10" /><rect width="6" height="6" x="9" y="9" /></>} {...props} />,
-            ArrowLeft: (props) => <SharedIcon path={<><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></>} {...props} />,
-            CheckCircle2: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></>} {...props} />,
-            BarChart3: (props) => <SharedIcon path={<><path d="M3 3v18h18" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></>} {...props} />,
-            Wind: (props) => <SharedIcon path={<><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></>} {...props} />,
-            BookOpen: (props) => <SharedIcon path={<><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></>} {...props} />,
-            X: (props) => <SharedIcon path={<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>} {...props} />,
-            AlertTriangle: (props) => <SharedIcon path={<><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></>} {...props} />,
-            CheckCircle: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></>} {...props} />,
-            XCircle: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></>} {...props} />,
-            RotateCcw: (props) => <SharedIcon path={<><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></>} {...props} />,
-            Cpu: (props) => <SharedIcon path={<><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 14h3"/><path d="M1 9h3"/><path d="M1 14h3"/></>} {...props} />,
-            Globe: (props) => <SharedIcon path={<><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></>} {...props} />,
-            ExternalLink: (props) => <SharedIcon path={<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></>} {...props} />
-        };
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-map"></i> Roadmap</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-list-check"></i> Tasks & Plan</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-bullseye"></i> Skills Tracker</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-certificate"></i> Certifications</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-graduation-cap"></i> Master Programs</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-folder-open"></i> Projects / Portfolio</a>
+            <a href="#" class="nav-item"><i class="fa-regular fa-calendar-check"></i> Weekly Review</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-chart-simple"></i> Analytics</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-book"></i> Resources</a>
+        </nav>
+    </aside>
 
-        const DICT = {
-            en: {
-                lang: 'en',
-                streamsTitle: "STREAMS", guidelinesTitle: "SOP & Guidelines",
-                streamElectrical: "ELECTRICAL", streamNitrogen: "NITROGEN", streamAir: "AIR", streamWater: "WATER", streamSteam: "STEAM",
-                titleElec: "Electrical Peak Simulator", subtitleElec: "Stream 01 Decision Support",
-                currentPeak: "Current Peak Load (MW)", editHint: "Click to edit base load",
-                safeZone: "< 112 MW (Safe)", dangerZone: "112 - 114 MW (Danger)", criticalZone: "> 114 MW (Critical)",
-                assistantTitle: "Smart Operation Assistant", assistantSub: "Automated 'What If' Scenarios", reset: "Reset",
-                critAlert: "Critical Overload", critDesc: "Current load exceeds 114 MW. Do not energize new equipment. Action is required to balance the grid below 112 MW.",
-                warnAlert: "Danger Zone", warnDesc: "Current load is in the danger zone (112-114 MW).",
-                urgentQ: "Is the energization request strictly URGENT?",
-                yesUrgent: "Yes, Urgent", noPostpone: "No, Postpone",
-                postponed: "Operation Postponed", postponedDesc: "Please delay the request until grid load stabilizes.",
-                stableAlert: "Grid is Stable",
-                addLoadPrompt: "Expected load of the new equipment (MW):", simulateBtn: "Simulate Impact",
-                safeOp: "Safe to Energize", safeOpDesc: "Expected peak is under safe limits ({val} MW). Safe to proceed.",
-                expHighAlert: "Expected Peak is High", expHighDesc: "Adding this equipment pushes the grid to Danger Zone (112-114 MW).",
-                expCritAlert: "Expected Peak is Critical", expCritDesc: "Adding this equipment exceeds the absolute limit (>114 MW).",
-                actionReq: "Grid Balancing Required", targetRed: "Capacity Needed (<112MW):",
-                shedPrompt: "Enter load to SHED (MW):", applyShed: "Apply Shedding",
-                genReq: "Increase Generation", genReqDesc: "Shedding is insufficient. Increase internal generation by:",
-                genNote: "Max capacity per generator is 21 MW.",
-                success: "Grid Secured", successDesc: "Grid is balanced. Safe to proceed.", mw: "MW",
-                genControl: "Internal Generators Control", gen: "Gen", maxGen: "Max 21",
-                titleNitro: "Nitrogen Dashboard", subtitleNitro: "Stream 02 Performance",
-                nitroOverview: "Nitrogen Overview", live: "LIVE", sim: "SIMULATOR",
-                sysDemand: "System Demand", designPeak: "Design Peak", dailyAlloc: "Daily Allocation",
-                consGauges: "Consumption Gauges", total: "Total", plantLoads: "Plant Loads", attachExcel: "Attach Excel", syncStop: "Stop Sync",
-                nitroAsstTitle: "Nitrogen Smart Assistant", nitroAsstSub: "Demand Simulation", nitroSimBtn: "Simulate Request",
-                nitroAddPrompt: "Enter requested quantity (Ton/h):", nitroSafe: "Safe to Proceed",
-                nitroSafeDesc: "Expected total consumption will remain under the 31 Ton/h threshold.",
-                nitroWarn: "Daily Limit Risk", nitroWarnDesc: "Adding this request pushes total consumption over 31 Ton/h. Sustaining this rate for 24 hours risks exceeding the daily limit (744 Ton).",
-                attachHelp: "Attachment Instructions",
-                attachSteps: [
-                    "Open Excel sheet.",
-                    "Press Update then save the file.",
-                    "Attach the excel sheet and keep the file open.",
-                    "Every time you want to update the data, update the excel and save."
+    <main class="main-content">
+        <header class="topbar">
+            <div class="welcome">
+                <h1>Welcome back, Abdulaziz!</h1>
+                <p>Track your 3-year journey to become an AI Infrastructure & Energy Intelligence Specialist</p>
+            </div>
+            <div class="top-actions">
+                <div class="date-picker"><i class="fa-regular fa-calendar" style="margin-right: 5px;"></i> 20 May 2026</div>
+                <div class="icon-btn"><i class="fa-regular fa-bell"></i></div>
+                <div class="icon-btn"><i class="fa-solid fa-gear"></i></div>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <div class="kpi-row">
+                <div class="kpi-card overall-kpi">
+                    <div class="circular-chart">
+                        <div class="circular-val">28%</div>
+                    </div>
+                    <div class="overall-details">
+                        <div style="color: var(--text-secondary); margin-bottom: 5px;">Target: 28%<br>Actual: 28%</div>
+                        <div class="badge-green">On Track</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-top"><span><i class="fa-regular fa-clock"></i> Study Hours This Month</span></div>
+                    <div class="kpi-value">46 <span style="font-size: 14px; color: var(--text-secondary);">/ 80</span></div>
+                    <div class="progress-sm"><div class="progress-sm-fill" style="width: 58%; background: var(--accent-blue);"></div></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-top"><span><i class="fa-solid fa-certificate"></i> Certifications Completed</span></div>
+                    <div class="kpi-value">1 <span style="font-size: 14px; color: var(--text-secondary);">/ 4</span></div>
+                    <div class="progress-sm"><div class="progress-sm-fill" style="width: 25%; background: #EAB308;"></div></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-top"><span><i class="fa-solid fa-code"></i> Projects Completed</span></div>
+                    <div class="kpi-value">1 <span style="font-size: 14px; color: var(--text-secondary);">/ 5</span></div>
+                    <div class="progress-sm"><div class="progress-sm-fill" style="width: 20%; background: var(--accent-blue);"></div></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-top"><span><i class="fa-solid fa-crosshairs"></i> Skills On Target</span></div>
+                    <div class="kpi-value">6 <span style="font-size: 14px; color: var(--text-secondary);">/ 12</span></div>
+                    <div class="progress-sm"><div class="progress-sm-fill" style="width: 50%; background: var(--accent-green);"></div></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-top"><span><i class="fa-brands fa-linkedin"></i> LinkedIn Posts</span></div>
+                    <div class="kpi-value">4 <span style="font-size: 14px; color: var(--text-secondary);">This Month</span></div>
+                </div>
+            </div>
+
+            <div class="panel overview-panel">
+                <div class="panel-header">
+                    <span>3-Year Roadmap Overview</span>
+                </div>
+                <div style="height: 4px; background: linear-gradient(90deg, var(--accent-green) 33%, var(--accent-blue) 33%, var(--accent-blue) 66%, var(--accent-purple) 66%); border-radius: 2px; margin-bottom: 20px;"></div>
+                <div class="overview-cards">
+                    <div class="year-card">
+                        <div class="year-title">Year 1 (2026)</div>
+                        <div class="year-desc">Foundation & Master Prep</div>
+                        <div class="ring-sm ring-1"><div class="ring-inner">28%</div></div>
+                        <div style="font-size: 10px; color: var(--accent-green); margin-top: 5px;">On Track</div>
+                    </div>
+                    <div class="year-card">
+                        <div class="year-title" style="color: var(--accent-blue);">Year 2 (2027)</div>
+                        <div class="year-desc">Master + AI / Cloud</div>
+                        <div class="ring-sm ring-2"><div class="ring-inner">15%</div></div>
+                        <div style="font-size: 10px; color: var(--accent-green); margin-top: 5px;">On Track</div>
+                    </div>
+                    <div class="year-card">
+                        <div class="year-title" style="color: var(--accent-purple);">Year 3 (2028-2029)</div>
+                        <div class="year-desc">Execution & Market Entry</div>
+                        <div class="ring-sm ring-3"><div class="ring-inner">5%</div></div>
+                        <div style="font-size: 10px; color: var(--accent-green); margin-top: 5px;">On Track</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel trend-panel">
+                <div class="panel-header">
+                    <span>Monthly Progress Trend</span>
+                    <select style="background: var(--bg-main); color: var(--text-secondary); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px;"><option>3 Years</option></select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel tasks-panel">
+                <div class="panel-header">
+                    <span>Upcoming Tasks</span>
+                    <a href="#" class="panel-link">View All →</a>
+                </div>
+                <div class="list-item">
+                    <div class="list-info">
+                        <h4 style="border-left: 2px solid var(--accent-blue); padding-left: 8px;">Complete PL-300 Certification</h4>
+                        <p style="padding-left: 10px;">Microsoft Power BI Data Analyst</p>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">15 Aug 2026</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-info">
+                        <h4 style="border-left: 2px solid var(--accent-blue); padding-left: 8px;">Build Energy Optimization Dashboard</h4>
+                        <p style="padding-left: 10px;">Project</p>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">30 Jun 2026</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-info">
+                        <h4 style="border-left: 2px solid var(--accent-green); padding-left: 8px;">Finish Python Advanced</h4>
+                        <p style="padding-left: 10px;">Course</p>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">10 Jun 2026</div>
+                </div>
+            </div>
+
+            <div class="panel radar-panel">
+                <div class="panel-header">
+                    <span>Skills Radar</span>
+                    <a href="#" class="panel-link">View All →</a>
+                </div>
+                <div class="chart-container" style="height: 180px; display: flex; justify-content: center;">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel projects-panel">
+                <div class="panel-header">
+                    <span>Recent Projects</span>
+                    <a href="#" class="panel-link">View All →</a>
+                </div>
+                <div class="list-item">
+                    <div class="list-info">
+                        <h4><i class="fa-solid fa-chart-line" style="color: var(--text-secondary); margin-right: 5px;"></i> AI Data Center Energy Dashboard</h4>
+                        <p style="padding-left: 20px;">Dashboard</p>
+                    </div>
+                    <div class="status-completed"><i class="fa-regular fa-circle-check"></i> Completed</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-info">
+                        <h4><i class="fa-solid fa-bolt" style="color: var(--text-secondary); margin-right: 5px;"></i> Energy Optimization Analytics</h4>
+                        <p style="padding-left: 20px;">Analytics</p>
+                    </div>
+                    <div class="status-progress"><i class="fa-solid fa-spinner"></i> In Progress</div>
+                </div>
+                <div class="list-item">
+                    <div class="list-info">
+                        <h4><i class="fa-solid fa-server" style="color: var(--text-secondary); margin-right: 5px;"></i> AI Infrastructure Monitoring</h4>
+                        <p style="padding-left: 20px;">System</p>
+                    </div>
+                    <div class="status-progress"><i class="fa-solid fa-spinner"></i> In Progress</div>
+                </div>
+            </div>
+
+            <div class="panel week-summary">
+                <div style="display: flex; gap: 20px; width: 100%;">
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px;">Planned Tasks</div>
+                        <div style="font-size: 20px; font-weight: 600; color: var(--accent-blue);">8</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px;">Completed</div>
+                        <div style="font-size: 20px; font-weight: 600; color: var(--accent-green);">5</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px;">Study Hours</div>
+                        <div style="font-size: 20px; font-weight: 600;">12.5h</div>
+                    </div>
+                    <div style="border-left: 1px solid var(--border-color); padding-left: 15px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px;">Focus Area</div>
+                        <div style="font-size: 13px; font-weight: 500;">Python, Power BI</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel quote-panel">
+                "The best way to predict the future is to create it. Keep building."
+            </div>
+
+            <div class="panel links-panel">
+                <div class="link-icon"><i class="fa-solid fa-map"></i> Roadmap</div>
+                <div class="link-icon"><i class="fa-solid fa-list-check"></i> Tasks</div>
+                <div class="link-icon"><i class="fa-solid fa-bullseye"></i> Skills</div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Global defaults for dark theme
+        Chart.defaults.color = '#94A3B8';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        // --- Line Chart (Monthly Progress Trend) ---
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan 2026', 'May 2026', 'Sep 2026', 'Jan 2027', 'May 2027', 'Sep 2027'],
+                datasets: [
+                    {
+                        label: 'Actual Progress %',
+                        data: [0, 28, null, null, null, null],
+                        borderColor: '#3B82F6',
+                        backgroundColor: '#3B82F6',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 4
+                    },
+                    {
+                        label: 'Target Progress %',
+                        data: [0, 28, 45, 60, 75, 100],
+                        borderColor: '#1E293B',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        pointRadius: 0
+                    }
                 ]
             },
-            ar: {
-                lang: 'ar',
-                streamsTitle: "المسارات", guidelinesTitle: "الأدلة الإرشادية",
-                streamElectrical: "الكهرباء", streamNitrogen: "النيتروجين", streamAir: "الهواء", streamWater: "المياه", streamSteam: "البخار",
-                titleElec: "Electrical Peak Simulator", subtitleElec: "Stream 01 Decision Support",
-                currentPeak: "حمل الذروة للشبكة الفعلي", editHint: "انقر لتعديل الحمل الأساسي",
-                safeZone: "أقل من 112 (آمن)", dangerZone: "112 - 114 (خطر)", criticalZone: "أعلى من 114 (حرج)",
-                assistantTitle: "المساعد التشغيلي الذكي", assistantSub: "محاكاة السيناريوهات المؤتمتة", reset: "إعادة تقييم",
-                critAlert: "تجاوز الحد الحرج", critDesc: "الحمل الحالي يتجاوز 114 ميجاوات. يجب خفض الحمل أو زيادة التوليد لتأمين الشبكة (أقل من 112). لا تقم بتشغيل أي معدة.",
-                warnAlert: "منطقة الخطر", warnDesc: "الحمل الحالي مرتفع جداً ويقع في منطقة الخطر (112-114 ميجاوات).",
-                urgentQ: "هل طلب التشغيل يعتبر أمراً طارئاً وضرورياً جداً؟",
-                yesUrgent: "نعم، ضروري", noPostpone: "لا، يمكن التأجيل",
-                postponed: "تم تأجيل التشغيل", postponedDesc: "بما أن الطلب غير ضروري، يرجى تأجيل التشغيل وجدولته لاحقاً عندما يكون الحمل أقل من 114 للحفاظ على استقرار الشبكة.",
-                stableAlert: "الشبكة مستقرة",
-                addLoadPrompt: "أدخل الاستهلاك المتوقع للمعدة المراد تشغيلها:", simulateBtn: "محاكاة التأثير",
-                safeOp: "تصريح بالتشغيل (آمن)", safeOpDesc: "الاستهلاك الكلي المتوقع سيبقى ضمن الحدود الآمنة ({val} ميجاوات). يمكنك المضي قدماً في التشغيل.",
-                expHighAlert: "تنبيه: الحمل المتوقع مرتفع", expHighDesc: "تشغيل هذه المعدة سيدخل الشبكة في منطقة الخطر (112-114).",
-                expCritAlert: "تنبيه: الحمل المتوقع حرج", expCritDesc: "تشغيل هذه المعدة سيتجاوز الحد الأقصى المسموح للشبكة (114+).",
-                actionReq: "إجراء مطلوب لموازنة الشبكة", targetRed: "الطاقة المطلوبة لتأمين الشبكة (<112):",
-                shedPrompt: "أدخل استهلاك المعدة المراد إطفاؤها (Load Shedding):", applyShed: "تأكيد الإطفاء",
-                genReq: "يتطلب رفع التوليد الداخلي", genReqDesc: "عملية الإطفاء غير كافية. لتأمين الشبكة، يجب زيادة التوليد بمقدار:",
-                genNote: "ملاحظة هامة: أقصى طاقة للمولد الواحد هي 21 ميجاوات.",
-                success: "تم تأمين الشبكة", successDesc: "الشبكة الآن متزنة وآمنة. يمكنك المضي قدماً في التشغيل.", mw: "ميجاوات",
-                genControl: "التحكم بالمولدات الداخلية", gen: "Gen", maxGen: "حد أقصى 21",
-                titleNitro: "Nitrogen Dashboard", subtitleNitro: "Stream 02 Performance",
-                nitroOverview: "نظرة عامة للنيتروجين", live: "مباشر", sim: "محاكي",
-                sysDemand: "طلب النظام (System Demand)", designPeak: "ذروة التصميم (Peak)", dailyAlloc: "المخصص اليومي",
-                consGauges: "عدادات الاستهلاك", total: "الإجمالي", plantLoads: "أحمال المصانع", attachExcel: "إرفاق ملف إكسل", syncStop: "إيقاف المزامنة",
-                nitroAsstTitle: "المساعد الذكي للنيتروجين", nitroAsstSub: "محاكاة طلبات الاستهلاك", nitroSimBtn: "محاكاة الكمية",
-                nitroAddPrompt: "أدخل الكمية المطلوبة (طن/ساعة):", nitroSafe: "آمن للتشغيل",
-                nitroSafeDesc: "الاستهلاك الكلي المتوقع سيبقى ضمن الحدود الآمنة (أقل من 31 طن/ساعة).",
-                nitroWarn: "خطر تجاوز الحد اليومي", nitroWarnDesc: "الكمية المطلوبة سترفع الاستهلاك الكلي ليتجاوز 31 طن/ساعة. الاستمرار بهذا المعدل لمدة 24 ساعة سيعرضنا لتجاوز الحد اليومي المسموح (744 طن).",
-                attachHelp: "تعليمات الإرفاق",
-                attachSteps: [
-                    "افتح ملف الإكسل.",
-                    "اضغط على تحديث (Update) ثم احفظ الملف.",
-                    "قم بإرفاق ملف الإكسل وأبقِ الملف مفتوحاً.",
-                    "في كل مرة تريد تحديث البيانات، قم بتحديث الإكسل واحفظه."
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: 'rgba(30, 41, 59, 0.5)' },
+                        ticks: { stepSize: 25, callback: function(value) { return value + '%'; } }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // --- Radar Chart (Skills Radar) ---
+        const radarCtx = document.getElementById('radarChart').getContext('2d');
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Python', 'SQL', 'Power BI', 'Data Analytics', 'Azure', 'LLMs', 'Data Engineering', 'Energy Systems', 'Data Center Infrastructure'],
+                datasets: [
+                    {
+                        label: 'Target Level',
+                        data: [5, 5, 5, 5, 4, 3, 3, 5, 5],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 1,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Current Level',
+                        data: [3, 4, 4, 3, 1, 1, 1, 4, 4],
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#3B82F6'
+                    }
                 ]
-            }
-        };
-
-        const DashboardHeader = ({ title, subtitle, icon: IconCmp, onBack, lang, setLang }) => (
-            <header className="bg-white shadow-lg border-b-4 border-amber-400 sticky top-0 z-40">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                    <div className="flex items-center space-x-4 gap-2">
-                        {onBack && <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"><SharedIcons.ArrowLeft className="w-6 h-6" style={lang === 'ar' ? {transform: 'scaleX(-1)'} : {}} /></button>}
-                        <div className="bg-blue-900 p-2 rounded-lg"><IconCmp className="w-6 h-6 text-white" /></div>
-                        <div dir="ltr" className="text-left flex flex-col">
-                            <h1 className="text-xl md:text-2xl font-bold text-blue-900 tracking-tight leading-tight">YANSAB <span className="text-slate-500 font-light">{title}</span></h1>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">{subtitle}</p>
-                        </div>
-                    </div>
-                    <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-full text-xs font-bold transition-colors shadow-sm border border-slate-200">
-                        <SharedIcons.Globe className="w-4 h-4" /> {lang === 'ar' ? 'English' : 'العربية'}
-                    </button>
-                </div>
-            </header>
-        );
-
-        const FileUploader = ({ onFileUpload, t, onShowHelp }) => {
-            const [isSyncing, setIsSyncing] = useState(false); const intervalRef = useRef(null); const lastModifiedRef = useRef(0);
-            const startLiveSync = async () => {
-                try {
-                    const [handle] = await window.showOpenFilePicker(); const file = await handle.getFile(); setIsSyncing(true); lastModifiedRef.current = file.lastModified; await onFileUpload(file);
-                    intervalRef.current = setInterval(async () => { const currentFile = await handle.getFile(); if (currentFile.lastModified > lastModifiedRef.current) { lastModifiedRef.current = currentFile.lastModified; await onFileUpload(currentFile); } }, 2000);
-                } catch (e) { console.error("Sync error", e); }
-            };
-            return (
-                <div className="flex items-center gap-2">
-                    <button onClick={onShowHelp} title={t.attachHelp} className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition-colors focus:outline-none">
-                        <SharedIcons.Info className="w-5 h-5" />
-                    </button>
-                    <div className="info-tooltip relative flex items-center">
-                        {isSyncing ? <button onClick={() => {clearInterval(intervalRef.current); setIsSyncing(false);}} className="flex items-center px-4 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-lg text-sm font-bold animate-pulse"><SharedIcons.StopCircle className="w-4 h-4 mr-2" /> {t.syncStop}</button> : <button onClick={startLiveSync} className="flex items-center px-5 py-2.5 bg-blue-900 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-blue-800 transition-all"><SharedIcons.FolderInput className="w-4 h-4 mr-2" /> {t.attachExcel}</button>}
-                    </div>
-                </div>
-            );
-        };
-
-        const InlineEditable = ({ value, unit, onSave }) => {
-            const [isEditing, setIsEditing] = useState(false);
-            const [tempVal, setTempVal] = useState(value);
-            useEffect(() => { setTempVal(value); }, [value]);
-            const commit = () => { setIsEditing(false); let parsed = parseFloat(tempVal); if (!isNaN(parsed)) onSave(parsed); else setTempVal(value); };
-            if (isEditing) {
-                return (
-                    <div className="flex items-center gap-1 animate-fade-in">
-                        <input autoFocus type="number" value={tempVal} onChange={e => setTempVal(e.target.value)} onBlur={commit} onKeyDown={e => e.key === 'Enter' && commit()} className="w-16 text-center text-xs font-black text-blue-900 bg-blue-50/50 outline-none inline-input px-1 py-0.5 rounded" dir="ltr" />
-                        {unit && <span className="text-[10px] font-bold text-slate-500">{unit}</span>}
-                    </div>
-                );
-            }
-            return (
-                <div onClick={() => setIsEditing(true)} className="flex items-center gap-1 cursor-pointer group px-2 py-0.5 rounded hover:bg-blue-50 transition-colors" title="Click to edit">
-                    <span className="text-[11px] font-black text-slate-700 group-hover:text-blue-600 border-b border-dashed border-slate-300 group-hover:border-blue-500 transition-colors" dir="ltr">{value}</span>
-                    {unit && <span className="text-[10px] font-bold text-slate-500">{unit}</span>}
-                </div>
-            );
-        };
-
-        const ElectricalSmartAssistant = ({ currentLoad, lang }) => {
-            const t = DICT[lang];
-            const TARGET_SAFE = 111.9; 
-            
-            const [phase, setPhase] = useState('INIT'); 
-            const [addedLoad, setAddedLoad] = useState('');
-            const [shedLoad, setShedLoad] = useState('');
-            const [expectedLoad, setExpectedLoad] = useState(0);
-
-            useEffect(() => { setPhase('INIT'); setAddedLoad(''); setShedLoad(''); }, [currentLoad]);
-
-            const isDangerCurrent = currentLoad >= 112 && currentLoad < 114;
-            const isCritCurrent = currentLoad >= 114;
-            const activeExpected = phase === 'INIT' ? currentLoad : expectedLoad;
-            
-            const targetTotalToReduce = isDangerCurrent && phase === 'ACTION_REQ' ? currentLoad : activeExpected;
-            const requiredReduction = Math.max(0, targetTotalToReduce - TARGET_SAFE);
-            const remainingReduction = Math.max(0, requiredReduction - Number(shedLoad || 0));
-
-            const renderPhase = () => {
-                if (phase === 'INIT') {
-                    if (isCritCurrent) {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.AlertTriangle className="w-16 h-16 text-rose-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-rose-600 mb-2">{t.critAlert}</h3>
-                                <p className="text-slate-600 mb-8 max-w-sm mx-auto">{t.critDesc}</p>
-                                <button onClick={() => { setExpectedLoad(currentLoad); setPhase('ACTION_REQ'); }} className="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">{t.actionReq}</button>
-                            </div>
-                        );
-                    } else if (isDangerCurrent) {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.Activity className="w-16 h-16 text-amber-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-amber-600 mb-2">{t.warnAlert}</h3>
-                                <p className="text-slate-600 mb-8 max-w-sm mx-auto">{t.warnDesc}<br/><br/><strong className="text-slate-800">{t.urgentQ}</strong></p>
-                                <div className="flex gap-4 justify-center">
-                                    <button onClick={() => setPhase('INPUT_ADDED')} className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-sm w-44">{t.yesUrgent}</button>
-                                    <button onClick={() => setPhase('POSTPONED')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-xl transition-all w-44">{t.noPostpone}</button>
-                                </div>
-                            </div>
-                        );
-                    } else {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.stableAlert}</h3>
-                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto mt-6">
-                                    <label className="block text-sm font-bold text-slate-600 mb-4">{t.addLoadPrompt}</label>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <input type="number" value={addedLoad} onChange={e => setAddedLoad(e.target.value)} placeholder="0.0" className="w-full text-center text-3xl font-black text-blue-900 bg-blue-50/50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
-                                        <span className="text-lg font-bold text-slate-400">{t.mw}</span>
-                                    </div>
-                                    <button onClick={() => { if(!addedLoad || isNaN(addedLoad)) return; setExpectedLoad(currentLoad + Number(addedLoad)); setPhase('EVAL_EXPECTED'); }} disabled={!addedLoad} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl transition-all shadow-md">{t.simulateBtn}</button>
-                                </div>
-                            </div>
-                        );
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(30, 41, 59, 0.8)' },
+                        grid: { color: 'rgba(30, 41, 59, 0.8)' },
+                        pointLabels: { color: '#94A3B8', font: { size: 10 } },
+                        ticks: { display: false, min: 0, max: 5 }
                     }
                 }
-
-                if (phase === 'INPUT_ADDED') {
-                    return (
-                        <div className="animate-fade-in text-center">
-                            <h3 className="text-xl font-black text-blue-900 mb-6">{t.addLoadPrompt}</h3>
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-sm mx-auto">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <input type="number" value={addedLoad} onChange={e => setAddedLoad(e.target.value)} placeholder="0.0" className="w-full text-center text-3xl font-black text-blue-900 bg-blue-50/50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
-                                    <span className="text-lg font-bold text-slate-400">{t.mw}</span>
-                                </div>
-                                <button onClick={() => { if(!addedLoad || isNaN(addedLoad)) return; setExpectedLoad(currentLoad + Number(addedLoad)); setPhase('EVAL_EXPECTED'); }} disabled={!addedLoad} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl transition-all shadow-md">{t.simulateBtn}</button>
-                            </div>
-                        </div>
-                    );
-                }
-
-                if (phase === 'POSTPONED') {
-                    return (
-                        <div className="animate-fade-in text-center">
-                            <SharedIcons.CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
-                            <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.postponed}</h3>
-                            <p className="text-slate-600 mb-8 max-w-sm mx-auto">{t.postponedDesc}</p>
-                            <button onClick={() => setPhase('INIT')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition-all shadow-sm">{t.reset}</button>
-                        </div>
-                    );
-                }
-
-                if (phase === 'EVAL_EXPECTED') {
-                    if (activeExpected < 112) {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.safeOp}</h3>
-                                <p className="text-emerald-700 mb-8 max-w-sm mx-auto">{t.safeOpDesc.replace('{val}', activeExpected.toFixed(1))}</p>
-                                <button onClick={() => {setPhase('INIT'); setAddedLoad('');}} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition-all shadow-sm">{t.reset}</button>
-                            </div>
-                        );
-                    } else if (activeExpected >= 112 && activeExpected < 114) {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-amber-600 mb-2">{t.expHighAlert}</h3>
-                                <p className="text-amber-700 mb-8 max-w-sm mx-auto">{t.expHighDesc} ({activeExpected.toFixed(1)} {t.mw})</p>
-                                <button onClick={() => setPhase('ACTION_REQ')} className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">{t.actionReq}</button>
-                            </div>
-                        );
-                    } else {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.StopCircle className="w-16 h-16 text-rose-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-rose-600 mb-2">{t.expCritAlert}</h3>
-                                <p className="text-rose-700 mb-8 max-w-sm mx-auto">{t.expCritDesc} ({activeExpected.toFixed(1)} {t.mw})</p>
-                                <button onClick={() => setPhase('ACTION_REQ')} className="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md">{t.actionReq}</button>
-                            </div>
-                        );
-                    }
-                }
-
-                if (phase === 'ACTION_REQ') {
-                    if (remainingReduction <= 0) {
-                        return (
-                            <div className="animate-fade-in text-center">
-                                <SharedIcons.CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4 drop-shadow-md" />
-                                <h3 className="text-2xl font-black text-emerald-600 mb-2">{t.success}</h3>
-                                <p className="text-emerald-700 mb-8 max-w-sm mx-auto">{t.successDesc}</p>
-                                <button onClick={() => {setPhase('INIT'); setShedLoad(''); setAddedLoad('');}} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-xl transition-all shadow-sm">{t.reset}</button>
-                            </div>
-                        );
-                    }
-
-                    return (
-                        <div className="animate-fade-in max-w-md mx-auto">
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-rose-100 mb-6">
-                                <div className="flex justify-between items-center mb-4">
-                                    <span className="font-bold text-slate-700">{t.targetRed}</span>
-                                    <span className="text-xl font-black text-rose-600 bg-rose-50 px-3 py-1 rounded-lg" dir="ltr">{remainingReduction.toFixed(1)} {t.mw}</span>
-                                </div>
-                                <div className="mt-4 pt-4 border-t border-slate-100">
-                                    <label className="block text-sm font-bold text-slate-600 mb-2">{t.shedPrompt}</label>
-                                    <div className="flex items-center gap-2">
-                                        <input type="number" value={shedLoad} onChange={e => setShedLoad(e.target.value)} placeholder="0.0" className="flex-1 text-center text-xl font-bold text-blue-900 bg-blue-50/50 p-3 rounded-xl smart-input hide-arrows" dir="ltr" />
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                                <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><SharedIcons.Cpu className="w-5 h-5"/> {t.genReq}</h4>
-                                <p className="text-sm text-blue-700 mb-4">{t.genReqDesc}</p>
-                                <div className="flex justify-center mb-4">
-                                    <span className="text-2xl font-black text-blue-800 bg-white px-4 py-2 rounded-xl shadow-sm border border-blue-100" dir="ltr">{remainingReduction.toFixed(1)} {t.mw}</span>
-                                </div>
-                                <div className="text-xs text-blue-600/80 bg-blue-100/50 p-3 rounded-lg flex items-start gap-2">
-                                    <SharedIcons.Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                                    <span>{t.genNote}</span>
-                                </div>
-                            </div>
-                            <div className="mt-6 flex justify-center">
-                                <button onClick={() => {setPhase('INIT'); setShedLoad(''); setAddedLoad('');}} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-6 rounded-xl transition-all shadow-sm text-sm">{t.reset}</button>
-                            </div>
-                        </div>
-                    );
-                }
-            };
-
-            return (
-                <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full opacity-50 pointer-events-none"></div>
-                    <div className="flex items-center gap-4 mb-8">
-                        <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-3 rounded-2xl shadow-md text-white">
-                            <SharedIcons.Activity className="w-8 h-8" />
-                        </div>
-                        <div>
-                            <h2 className="text-2xl font-black text-slate-800">{t.assistantTitle}</h2>
-                            <p className="text-blue-600 font-medium">{t.assistantSub}</p>
-                        </div>
-                    </div>
-                    <div className="min-h-[320px] flex flex-col justify-center">
-                        {renderPhase()}
-                    </div>
-                </div>
-            );
-        };
-
-        const Overview = ({ onNavigate, lang, setLang }) => {
-            const t = DICT[lang];
-            return (
-                <div dir={lang === 'ar' ? 'rtl' : 'ltr'} className={lang === 'ar' ? 'font-arabic' : 'font-sans'}>
-                    <DashboardHeader title={t.streamsTitle} subtitle="Overview" icon={SharedIcons.Activity} lang={lang} setLang={setLang} />
-                    <div className="max-w-5xl mx-auto p-6 mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <button onClick={() => onNavigate('ELECTRICAL_DASHBOARD')} className="flex flex-col items-center justify-center p-10 bg-white rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-blue-400 transition-all group">
-                            <div className="bg-blue-50 p-6 rounded-full group-hover:bg-blue-900 transition-colors mb-4">
-                                <SharedIcons.Zap className="w-16 h-16 text-blue-900 group-hover:text-white transition-colors" />
-                            </div>
-                            <h2 className="text-2xl font-bold text-slate-800">{t.streamElectrical}</h2>
-                        </button>
-
-                        <button onClick={() => onNavigate('NITROGEN_DASHBOARD')} className="flex flex-col items-center justify-center p-10 bg-white rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-blue-400 transition-all group">
-                            <div className="bg-blue-50 p-6 rounded-full group-hover:bg-blue-900 transition-colors mb-4">
-                                <SharedIcons.Wind className="w-16 h-16 text-blue-900 group-hover:text-white transition-colors" />
-                            </div>
-                            <h2 className="text-2xl font-bold text-slate-800">{t.streamNitrogen}</h2>
-                        </button>
-                    </div>
-                </div>
-            );
-        };
-
-        const ElectricalDashboard = ({ onBack, lang, setLang }) => {
-            const t = DICT[lang];
-            const [baseLoad, setBaseLoad] = useState(110);
-
-            return (
-                <div dir={lang === 'ar' ? 'rtl' : 'ltr'} className={`min-h-screen bg-slate-50 ${lang === 'ar' ? 'font-arabic' : 'font-sans'}`}>
-                    <DashboardHeader title={t.titleElec} subtitle={t.subtitleElec} icon={SharedIcons.Zap} onBack={onBack} lang={lang} setLang={setLang} />
-                    
-                    <div className="max-w-6xl mx-auto p-6 mt-6 animate-fade-in grid grid-cols-1 lg:grid-cols-12 gap-8">
-                        
-                        <div className="lg:col-span-4 space-y-6">
-                            <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 flex flex-col items-center text-center relative overflow-hidden">
-                                <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-50 rounded-full blur-2xl opacity-60 pointer-events-none"></div>
-                                <h3 className="text-slate-500 font-bold mb-4 uppercase tracking-widest text-sm">{t.currentPeak}</h3>
-                                <div className="bg-slate-50 p-6 rounded-2xl w-full flex justify-center mb-4 border border-slate-100">
-                                    <InlineEditable value={baseLoad} unit={t.mw} onSave={(val) => { setBaseLoad(val); }} />
-                                </div>
-                                <p className="text-xs text-slate-400 bg-slate-100 px-3 py-1 rounded-full">{t.editHint}</p>
-                            </div>
-                            
-                            <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 text-emerald-700 text-sm font-bold">
-                                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500"></div>{t.safeZone}</div>
-                                    </div>
-                                    <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50 text-amber-700 text-sm font-bold">
-                                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-500"></div>{t.dangerZone}</div>
-                                    </div>
-                                    <div className="flex items-center justify-between p-3 rounded-xl bg-rose-50 text-rose-700 text-sm font-bold">
-                                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-rose-500"></div>{t.criticalZone}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="lg:col-span-8">
-                            <ElectricalSmartAssistant currentLoad={baseLoad} lang={lang} />
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const NitrogenDashboard = ({ onBack, lang, setLang }) => {
-            const t = DICT[lang];
-            return (
-                <div dir={lang === 'ar' ? 'rtl' : 'ltr'} className={`min-h-screen bg-slate-50 ${lang === 'ar' ? 'font-arabic' : 'font-sans'}`}>
-                    <DashboardHeader title={t.titleNitro} subtitle={t.subtitleNitro} icon={SharedIcons.Wind} onBack={onBack} lang={lang} setLang={setLang} />
-                    <div className="max-w-4xl mx-auto p-4 mt-10 text-center animate-fade-in">
-                        <div className="bg-white p-10 rounded-2xl shadow border border-slate-200">
-                            <SharedIcons.Wind className="w-20 h-20 text-blue-200 mx-auto mb-4" />
-                            <h2 className="text-2xl font-bold text-slate-700">{t.nitroOverview}</h2>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const MainApp = () => {
-            const [view, setView] = useState('OVERVIEW');
-            const [lang, setLang] = useState('ar');
-            
-            useEffect(() => {
-                const loader = document.getElementById('loader');
-                if (loader) loader.style.display = 'none';
-            }, []);
-
-            return (
-                <div className="w-full min-h-screen">
-                    {view === 'OVERVIEW' && <Overview onNavigate={setView} lang={lang} setLang={setLang} />}
-                    {view === 'ELECTRICAL_DASHBOARD' && <ElectricalDashboard onBack={() => setView('OVERVIEW')} lang={lang} setLang={setLang} />}
-                    {view === 'NITROGEN_DASHBOARD' && <NitrogenDashboard onBack={() => setView('OVERVIEW')} lang={lang} setLang={setLang} />}
-                </div>
-            );
-        };
-
-        try {
-            const root = ReactDOM.createRoot(document.getElementById('root'));
-            root.render(<MainApp />);
-        } catch (err) {
-            const errDiv = document.getElementById('error-display');
-            if (errDiv) {
-                errDiv.style.display = 'block';
-                errDiv.innerHTML = 'Execution Error: ' + err.message;
             }
-            console.error(err);
-        }
+        });
     </script>
 </body>
 </html>
